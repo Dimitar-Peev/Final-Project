@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head th:replace="~{fragments/commons :: head('Edit Category')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header edit-event-header">
+            <div class="container">
+                <h1>Edit Category</h1>
+                <p>Update category details</p>
+            </div>
+        </section>
+
+        <section class="category-edit-section" sec:authorize="hasRole('ADMIN')">
+            <div class="container form-container">
+                <form th:action="@{/admin/categories/{id}(id=${categoryId})}"
+                      th:object="${categoryEditRequest}"
+                      th:method="put"
+                      class="event-form">
+
+                    <div th:if="${errorMessage}" class="alert danger">
+                        <p th:text="${errorMessage}"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Category Name</label>
+                        <input type="text" id="name" th:field="*{name}" placeholder="Category name">
+                        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" th:field="*{description}" rows="4" placeholder="Category description"></textarea>
+                        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="color" id="color" th:field="*{color}">
+                        <span th:if="${#fields.hasErrors('color')}" th:errors="*{color}" class="error-message"></span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                        <a th:href="@{/admin/categories}" class="btn btn-primary">Cancel</a>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
