@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('About Us')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header about-header">
+            <div class="container">
+                <h1>About EventHub</h1>
+                <p>Discover who we are and why we built EventHub</p>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="container">
+                <div class="about-intro">
+                    <h2>Our Mission</h2>
+                    <p>
+                        At <strong>EventHub</strong>, we believe that events connect people, ideas, and cultures.
+                        Our mission is to make discovering, booking, and organizing events simple and enjoyable.
+                    </p>
+                </div>
+
+                <div class="about-cards">
+                    <div class="about-card">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <h3>What We Do</h3>
+                        <p>
+                            EventHub helps you explore concerts, workshops, conferences, sports events, and more —
+                            all in one place. Book tickets in seconds and never miss out again!
+                        </p>
+                    </div>
+
+                    <div class="about-card">
+                        <i class="fa-solid fa-users"></i>
+                        <h3>Our Community</h3>
+                        <p>
+                            Thousands of users and organizers use EventHub every day to create memorable experiences.
+                            Whether you’re an attendee or an organizer, EventHub is your go-to platform.
+                        </p>
+                    </div>
+
+                    <div class="about-card">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <h3>Our Vision</h3>
+                        <p>
+                            We envision a world where anyone can easily share their passions and talents by hosting events,
+                            and anyone can join in and be inspired.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="about-team">
+                    <h2>Meet the Team</h2>
+                    <p>We’re a passionate group of developers, designers, and event enthusiasts building the future of event management.</p>
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <div class="team-avatar">👩‍💻</div>
+                            <h4>Alice Johnson</h4>
+                            <p>Frontend Developer</p>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">👨‍💻</div>
+                            <h4>Dimitar Peev</h4>
+                            <p>Backend Developer</p>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">🎨</div>
+                            <h4>Emma Brown</h4>
+                            <p>UI/UX Designer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
