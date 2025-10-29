@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Manage Venues')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Manage Venues</h1>
+                <p>View, add, edit, or delete venues</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div th:if="${successMessage}" class="alert success" style="margin-bottom: 2rem;">
+                    <p th:text="${successMessage}"></p>
+                </div>
+
+                <div class="dashboard-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2><i class="fa-solid fa-location-dot"></i> Venues List</h2>
+                        <a th:href="@{/admin/venues/new}" class="btn btn-primary">+ Add Venue</a>
+                    </div>
+
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>City</th>
+                                <th>Capacity</th>
+                                <th>Rate</th>
+                                <th>Contact</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="venue : ${venues}">
+                                <td th:text="${venue.name}">Arena Sofia</td>
+                                <td th:text="${venue.city}">Sofia</td>
+                                <td th:text="${venue.capacity}">5000</td>
+                                <td th:text="${venue.hourlyRate}">200</td>
+                                <td>
+                                    <span th:text="${venue.contactEmail}">contact@arena.bg</span><br>
+                                    <span th:text="${venue.contactPhone}">+359 888 123 456</span>
+                                </td>
+                                <td class="action-buttons">
+
+                                    <form th:action="@{/admin/venues/{id}(id=${venue.id})}" th:method="get" style="display:inline;">
+                                        <button type="submit" class="btn success">Edit</button>
+                                    </form>
+
+                                    <form th:action="@{/admin/venues/{id}(id=${venue.id})}" th:method="delete" style="display:inline;">
+                                        <button type="submit" class="btn danger"
+                                                onclick="return confirm('Are you sure you want to delete this venue?')">
+                                            Delete
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
