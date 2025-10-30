@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head th:replace="~{fragments/commons :: head('Discover Amazing Events')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Discover Amazing Events</h1>
+                <p>Find and book tickets for concerts, conferences, workshops, and more. Create unforgettable memories with EventHub.</p>
+                <div class="hero-buttons">
+                    <a th:href="@{/events}" class="btn btn-primary">Explore Events</a>
+                    <a th:href="@{/events/create}" class="btn btn-outline" sec:authorize="hasAnyRole('EVENT_ORGANIZER', 'ADMIN')">Create Event</a>
+                    <a th:href="@{/register}" class="btn btn-outline" sec:authorize="isAnonymous()">Join Now</a>
+                </div>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
+
+
+
