@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import static com.exam.eventhub.common.Constants.BINDING_MODEL;
-import static com.exam.eventhub.common.Constants.ERROR_MESSAGE;
+import static com.exam.eventhub.common.Constants.*;
 
 @Controller
 @AllArgsConstructor
