@@ -1,7 +1,6 @@
 package com.exam.eventhub.web;
 
 import com.exam.eventhub.category.service.CategoryService;
-import com.exam.eventhub.common.Constants;
 import com.exam.eventhub.contact.service.ContactService;
 import com.exam.eventhub.event.service.EventService;
 import com.exam.eventhub.web.dto.ContactMessageBinding;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import static com.exam.eventhub.common.Constants.BINDING_MODEL;
 import static com.exam.eventhub.common.Constants.ERROR_MESSAGE;
 
 @Controller
@@ -57,7 +57,7 @@ public class IndexController {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("contactMessage", contactMessage);
-            redirectAttributes.addFlashAttribute(Constants.BINDING_MODEL + "contactMessage", bindingResult);
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "contactMessage", bindingResult);
             redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
             return "redirect:/contact";
         }
