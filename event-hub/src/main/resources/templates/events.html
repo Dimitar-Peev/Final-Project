@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head th:replace="~{fragments/commons :: head('All Events')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>All Events</h1>
+                <p>Browse and discover events happening around you</p>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <form class="search-form" th:action="@{/events/search}" th:method="get">
+                        <div class="form-group">
+                            <label for="keyword">Event Name</label>
+                            <input type="text" id="keyword" name="keyword" th:value="${param.keyword}" placeholder="Search events...">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" th:value="${param.city}" placeholder="City...">
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryId">Category</label>
+                            <select id="categoryId" name="categoryId">
+                                <option value="">All Categories</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"
+                                        th:selected="${param.categoryId == category.id}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="events-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Events</h2>
+                    <p>Find events that match your interests</p>
+                </div>
+
+                <div class="events-grid" th:if="${events != null and !events.isEmpty()}">
+                    <a th:each="event : ${events}"
+                       th:href="@{/events/details/{id}(id=${event.id})}"
+                       class="event-card">
+                        <div class="event-image">
+                            <span th:switch="${event.category.name.toLowerCase()}">
+                                <span th:case="'music'">🎵</span>
+                                <span th:case="'technology'">💻</span>
+                                <span th:case="'business'">💼</span>
+                                <span th:case="'sports'">🏃</span>
+                                <span th:case="'art'">🎨</span>
+                                <span th:case="'food'">🍷</span>
+                                <span th:case="'education'">📚</span>
+                                <span th:case="'cars'">🚗</span>
+                                <span th:case="*" th:text="${#strings.substring(event.title, 0, 1)}"></span>
+                            </span>
+                            <span class="event-badge" th:if="${event.availableTickets < event.maxCapacity * 0.3}">
+                                Hot!
+                            </span>
+                        </div>
+                        <div class="event-content">
+                            <div class="event-date"
+                                 th:text="${#temporals.format(event.startDate, 'dd MMM yyyy • HH:mm')}"></div>
+                            <h3 class="event-title" th:text="${event.title}"></h3>
+                            <div class="event-location">📍
+                                <span th:text="${event.venue.name + ', ' + event.venueCity}"></span>
+                            </div>
+                            <div class="event-price">
+                                <span th:if="${event.ticketPrice == 0}">Free</span>
+                                <span th:unless="${event.ticketPrice == 0}"
+                                      th:text="'From ' + ${#numbers.formatDecimal(event.ticketPrice, 1, 2) + ' BGN / '
+                                      + #numbers.formatDecimal(event.ticketPrice / 1.95583, 1, 2) + ' EUR'}">
+                                      50.00 BGN / 25.56 EUR
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="no-events" th:if="${events == null or events.isEmpty()}">
+                    <h3>No events found</h3>
+                    <p style="margin-bottom: 1rem;">Try adjusting your search filters or check back later.</p>
+                    <a th:href="@{/events/create}" class="btn btn-primary"
+                       sec:authorize="hasAnyRole('EVENT_ORGANIZER','ADMIN')">
+                        Create Event
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
