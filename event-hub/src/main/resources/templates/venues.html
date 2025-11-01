@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Venues')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header venues-header">
+            <div class="container">
+                <h1>Venues</h1>
+                <p>Explore all available venues for events</p>
+            </div>
+        </section>
+
+        <section class="venues-section">
+            <div class="container">
+
+                <div class="venue-grid" th:if="${venues != null and !venues.isEmpty()}">
+                    <div class="venue-card" th:each="venue : ${venues}">
+                        <div class="venue-icon"><i class="fa-solid fa-building"></i></div>
+                        <h3 th:text="${venue.name}">Main Hall</h3>
+                        <p><i class="fa-solid fa-location-dot"></i>
+                            <span th:text="${venue.city}">Sofia</span></p>
+                        <p><i class="fa-solid fa-users"></i>Capacity: <span th:text="${venue.capacity}">500</span></p>
+                        <a th:href="@{/events/search(venueId=${venue.id})}" class="btn btn-green">View Events</a>
+                    </div>
+                </div>
+
+                <div class="no-events" th:if="${venues == null or venues.isEmpty()}">
+                    <h3>No venues available</h3>
+                    <p>Check back later or contact the administrator.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
