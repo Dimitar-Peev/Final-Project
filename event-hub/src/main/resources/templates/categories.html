@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Categories')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header categories-header">
+            <div class="container">
+                <h1>Event Categories</h1>
+                <p>Browse events by category</p>
+            </div>
+        </section>
+
+        <section class="categories-section">
+            <div class="container">
+
+                <div class="category-grid" th:if="${categories != null and !categories.isEmpty()}">
+                    <div class="category-card" th:each="category : ${categories}">
+                        <div class="category-icon">
+                            <span th:switch="${category.name.toLowerCase()}">
+                                <i class="fa-solid fa-music" th:case="'music'"></i>
+                                <i class="fa-solid fa-laptop-code" th:case="'technology'"></i>
+                                <i class="fa-solid fa-briefcase" th:case="'business'"></i>
+                                <i class="fa-solid fa-palette" th:case="'art'"></i>
+                                <i class="fa-solid fa-utensils" th:case="'food'"></i>
+                                <i class="fa-solid fa-book" th:case="'education'"></i>
+                                <i class="fa-solid fa-car" th:case="'cars'"></i>
+                                <i class="fa-solid fa-star" th:case="*"></i>
+                            </span>
+                        </div>
+                        <h3 th:text="${category.name}">Music</h3>
+                        <a th:href="@{/events/search(categoryId=${category.id})}" class="btn btn-green">View Events</a>
+                    </div>
+                </div>
+
+                <div class="no-events" th:if="${categories == null or categories.isEmpty()}">
+                    <h3>No categories available</h3>
+                    <p>Check back later or contact the administrator.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
