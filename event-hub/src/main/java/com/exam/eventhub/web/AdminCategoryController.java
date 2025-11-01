@@ -2,7 +2,6 @@ package com.exam.eventhub.web;
 
 import com.exam.eventhub.category.model.Category;
 import com.exam.eventhub.category.service.CategoryService;
-import com.exam.eventhub.common.Constants;
 import com.exam.eventhub.web.dto.CategoryCreateRequest;
 import com.exam.eventhub.web.dto.CategoryEditRequest;
 import com.exam.eventhub.web.mapper.DtoMapper;
@@ -53,7 +52,7 @@ public class AdminCategoryController {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("categoryCreateRequest", categoryCreateRequest);
-            redirectAttributes.addFlashAttribute(Constants.BINDING_MODEL + "categoryCreateRequest", bindingResult);
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "categoryCreateRequest", bindingResult);
             redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
             return "redirect:/admin/categories/new";
         }
@@ -84,7 +83,7 @@ public class AdminCategoryController {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("categoryEditRequest", categoryEditRequest);
-            redirectAttributes.addFlashAttribute(Constants.BINDING_MODEL + "categoryEditRequest", bindingResult);
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "categoryEditRequest", bindingResult);
             redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
             return "redirect:/admin/categories/" + id;
         }
