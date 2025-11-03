@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('My Profile')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="profile-section">
+            <div class="container">
+                <div class="profile-card">
+
+                    <div th:if="${successMessage}" class="alert success">
+                        <p th:text="${successMessage}"></p>
+                    </div>
+
+                    <h1>My Profile</h1>
+
+                    <div class="profile-avatar">
+                        <img th:src="${user.profileImageUrl != null && !user.profileImageUrl.isEmpty()
+                               ? user.profileImageUrl
+                               : 'https://static.vecteezy.com/system/resources/previews/048/926/061/non_2x/bronze-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-illustration-vector.jpg'}"
+                             alt="Profile Picture">
+                    </div>
+
+                    <div style="color: black; margin-bottom: 2rem">
+                        <div >
+                            <strong>User id: </strong>
+                            <span th:text="${user.id}"></span>
+                        </div>
+                    </div>
+
+                    <div class="profile-info">
+                        <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+                        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                        <p><strong>First Name:</strong>
+                            <span th:text="${#strings.isEmpty(user.firstName) ? 'Edit your profile and add first name' : user.firstName}"></span>
+                        </p>
+                        <p><strong>Last Name:</strong>
+                            <span th:text="${#strings.isEmpty(user.lastName) ? 'Edit your profile and add last name' : user.lastName}"></span>
+                        </p>
+                        <p><strong>Phone:</strong>
+                            <span th:text="${#strings.isEmpty(user.phoneNumber) ? 'Edit your profile and add phone number' : user.phoneNumber}"></span>
+                        </p>
+                        <p><strong>Role:</strong> <span th:text="${user.role.getDisplayName()}"></span></p>
+                        <p><strong>Member since:</strong>
+                            <span th:text="${#temporals.format(user.registrationDate, 'dd MMM yyyy • HH:mm')}"></span>
+                        </p>
+                        <p><strong>Last Updated:</strong>
+                            <span th:text="${#temporals.format(user.updatedAt, 'dd MMM yyyy • HH:mm')}"></span>
+                        </p>
+                    </div>
+
+                    <div class="profile-actions">
+                        <a th:href="@{/profile/edit}" class="btn btn-primary">Edit Profile</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
