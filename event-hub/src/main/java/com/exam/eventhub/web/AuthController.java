@@ -39,7 +39,7 @@ public class AuthController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("registerRequest", registerRequest);
             redirectAttributes.addFlashAttribute(BINDING_MODEL + "registerRequest", bindingResult);
-            redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, ERROR_MESSAGE);
             return "redirect:/register";
         }
 
