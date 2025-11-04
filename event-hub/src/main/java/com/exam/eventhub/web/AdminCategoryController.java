@@ -53,12 +53,12 @@ public class AdminCategoryController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("categoryCreateRequest", categoryCreateRequest);
             redirectAttributes.addFlashAttribute(BINDING_MODEL + "categoryCreateRequest", bindingResult);
-            redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, ERROR_MESSAGE);
             return "redirect:/admin/categories/new";
         }
 
         categoryService.add(categoryCreateRequest);
-        redirectAttributes.addFlashAttribute("successMessage", ADD_SUCCESSFUL.formatted(ENTITY_NAME));
+        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, ADD_SUCCESSFUL.formatted(ENTITY_NAME));
 
         return "redirect:/admin/categories";
     }
@@ -84,12 +84,12 @@ public class AdminCategoryController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("categoryEditRequest", categoryEditRequest);
             redirectAttributes.addFlashAttribute(BINDING_MODEL + "categoryEditRequest", bindingResult);
-            redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, ERROR_MESSAGE);
             return "redirect:/admin/categories/" + id;
         }
 
         categoryService.update(id, categoryEditRequest);
-        redirectAttributes.addFlashAttribute("successMessage", UPDATE_SUCCESSFUL.formatted(ENTITY_NAME));
+        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, UPDATE_SUCCESSFUL.formatted(ENTITY_NAME));
 
         return "redirect:/admin/categories";
     }
@@ -98,7 +98,7 @@ public class AdminCategoryController {
     public String deleteCategory(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
 
         categoryService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage",  DELETE_SUCCESSFUL.formatted(ENTITY_NAME));
+        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR,  DELETE_SUCCESSFUL.formatted(ENTITY_NAME));
 
         return "redirect:/admin/categories";
     }
