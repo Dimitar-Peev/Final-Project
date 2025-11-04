@@ -57,12 +57,12 @@ public class IndexController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("contactMessage", contactMessage);
             redirectAttributes.addFlashAttribute(BINDING_MODEL + "contactMessage", bindingResult);
-            redirectAttributes.addFlashAttribute("errorMessage", ERROR_MESSAGE);
+            redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, ERROR_MESSAGE);
             return "redirect:/contact";
         }
 
         contactService.add(contactMessage);
-        redirectAttributes.addFlashAttribute("successMessage", "Your message has been sent!");
+        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, "Your message has been sent!");
 
         return "redirect:/contact";
     }
