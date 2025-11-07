@@ -7,11 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class VenueEditRequest {
+
+    @NotNull
+    private UUID id;
 
     @NotBlank(message = "Venue name is required")
     @Size(min = 2, max = 100, message = "Venue name must be between 2 and 100 characters")
