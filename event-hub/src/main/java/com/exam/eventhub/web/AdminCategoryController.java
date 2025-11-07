@@ -71,7 +71,6 @@ public class AdminCategoryController {
             model.addAttribute("categoryEditRequest", DtoMapper.mapCategoryToCategoryEditRequest(category));
         }
 
-        model.addAttribute("categoryId", id);
         return "admin/category-edit";
     }
 
