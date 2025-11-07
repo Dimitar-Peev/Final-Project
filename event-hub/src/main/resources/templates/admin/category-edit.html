@@ -16,7 +16,7 @@
 
         <section class="category-edit-section" sec:authorize="hasRole('ADMIN')">
             <div class="container form-container">
-                <form th:action="@{/admin/categories/{id}(id=${categoryId})}"
+                <form th:action="@{/admin/categories/{id}(id=${categoryEditRequest.id})}"
                       th:object="${categoryEditRequest}"
                       th:method="put"
                       class="event-form">
