@@ -16,7 +16,7 @@
 
         <section class="event-edit-section" sec:authorize="hasRole('ADMIN')">
             <div class="container form-container">
-                <form th:action="@{/admin/venues/{id}(id=${venueId})}"
+                <form th:action="@{/admin/venues/{id}(id=${venueEditRequest.id})}"
                       th:object="${venueEditRequest}"
                       th:method="put"
                       class="event-form">
