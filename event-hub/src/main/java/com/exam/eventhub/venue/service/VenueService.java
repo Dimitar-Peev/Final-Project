@@ -117,7 +117,7 @@ public class VenueService {
         Venue venue = getById(id);
 
         Optional<Venue> byName = venueRepository.findByName(venueEditRequest.getName());
-        if (byName.isPresent()) {
+        if (byName.isPresent() && !byName.get().getId().equals(id)) {
             throw new VenueDuplicateException("The venue '" + venueEditRequest.getName() + "' already exists.", id);
         }
 
