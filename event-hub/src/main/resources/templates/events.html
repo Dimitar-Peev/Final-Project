@@ -67,8 +67,11 @@
                                 <span th:case="'cars'">🚗</span>
                                 <span th:case="*" th:text="${#strings.substring(event.title, 0, 1)}"></span>
                             </span>
-                            <span class="event-badge" th:if="${event.availableTickets < event.maxCapacity * 0.3}">
+                            <span class="event-badge" th:if="${event.availableTickets < event.maxCapacity * 0.3} and ${event.availableTickets > 0}">
                                 Hot!
+                            </span>
+                            <span class="event-badge" th:if="${event.availableTickets == 0}">
+                                Sold Out
                             </span>
                         </div>
                         <div class="event-content">
