@@ -2,7 +2,7 @@ package com.exam.eventhub.contact.service;
 
 import com.exam.eventhub.contact.model.Contact;
 import com.exam.eventhub.contact.repository.ContactRepository;
-import com.exam.eventhub.web.dto.ContactMessageBinding;
+import com.exam.eventhub.web.dto.ContactCreateRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,11 +19,11 @@ public class ContactService {
     private final ContactRepository contactRepository;
 
     @CacheEvict(value = "contacts", allEntries = true)
-    public Contact add(ContactMessageBinding contactRequest) {
-        String name = contactRequest.getName();
+    public Contact add(ContactCreateRequest contactCreateRequest) {
+        String name = contactCreateRequest.getName();
         log.info("Creating contact: {}", name);
 
-        Contact contact = create(contactRequest);
+        Contact contact = create(contactCreateRequest);
 
         Contact saved = contactRepository.save(contact);
 
@@ -32,12 +32,12 @@ public class ContactService {
         return saved;
     }
 
-    private Contact create(ContactMessageBinding contactMessageBinding) {
+    private Contact create(ContactCreateRequest contactCreateRequest) {
         Contact contact = new Contact();
 
-        contact.setName(contactMessageBinding.getName());
-        contact.setEmail(contactMessageBinding.getEmail());
-        contact.setMessage(contactMessageBinding.getMessage());
+        contact.setName(contactCreateRequest.getName());
+        contact.setEmail(contactCreateRequest.getEmail());
+        contact.setMessage(contactCreateRequest.getMessage());
 
         return contact;
     }
