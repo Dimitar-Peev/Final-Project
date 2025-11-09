@@ -53,7 +53,7 @@
 
                 <div class="events-grid" th:if="${events != null and !events.isEmpty()}">
                     <a th:each="event : ${events}"
-                       th:href="@{/events/details/{id}(id=${event.id})}"
+                       th:href="@{/events/{id}(id=${event.id})}"
                        class="event-card">
                         <div class="event-image">
                             <span th:switch="${event.category.name.toLowerCase()}">
@@ -76,7 +76,7 @@
                                  th:text="${#temporals.format(event.startDate, 'dd MMM yyyy • HH:mm')}"></div>
                             <h3 class="event-title" th:text="${event.title}"></h3>
                             <div class="event-location">📍
-                                <span th:text="${event.venue.name + ', ' + event.venueCity}"></span>
+                                <span th:text="${event.venue.name + ', ' + event.venue.getCity()}"></span>
                             </div>
                             <div class="event-price">
                                 <span th:if="${event.ticketPrice == 0}">Free</span>
