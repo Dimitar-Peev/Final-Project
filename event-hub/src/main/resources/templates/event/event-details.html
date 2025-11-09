@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head th:replace="~{fragments/commons :: head('Event Details')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="event-details-section">
+            <div class="container">
+                <h1 th:text="${event.title}">Event Title</h1>
+
+                <div class="event-meta">
+                    <p>
+                        <strong>Category:</strong> <span th:text="${event.category.name}"></span>
+                    </p>
+                    <p>
+                        <strong>Venue:</strong>
+                        <span th:text="${event.venue.name}"></span>,
+                        <span th:text="${event.venue.city}"></span>
+                    </p>
+                    <p>
+                        <strong>Organizer:</strong> <span th:text="${event.organizer.username}"></span>
+                    </p>
+                    <p>
+                        <strong>Status:</strong> <span th:text="${event.status}"></span>
+                    </p>
+                    <p>
+                        <strong>Start:</strong> <span th:text="${#temporals.format(event.startDate, 'dd MMM yyyy HH:mm')}"></span>
+                    </p>
+                    <p>
+                        <strong>End:</strong> <span th:text="${#temporals.format(event.endDate, 'dd MMM yyyy HH:mm')}"></span>
+                    </p>
+                </div>
+
+                <div class="event-description" style="margin-top: 1.5rem;">
+                    <h3>Description</h3>
+                    <p th:text="${event.description}"></p>
+                </div>
+
+                <div class="event-tickets" style="margin-top: 1.5rem;">
+                    <h3>Tickets</h3>
+                    <p>
+                        Available: <span th:text="${event.getAvailableTickets()}"></span> /
+                        <span th:text="${event.maxCapacity}"></span>
+                    </p>
+                    <p>
+                        Price:
+                        <span th:if="${event.ticketPrice == 0}">Free</span>
+                        <span th:unless="${event.ticketPrice == 0}"
+                              th:text="${#numbers.formatDecimal(event.ticketPrice,1,2) + ' BGN / '
+                               + #numbers.formatDecimal(event.ticketPrice / 1.95583, 1, 2) + ' EUR'}"></span>
+                    </p>
+                </div>
+
+                <div class="event-actions" style="margin-top: 2rem;">
+                    <form th:action="@{/bookings/my}" th:method="get"
+                          sec:authorize="hasAnyRole('USER')"
+                          style="display:inline;">
+                        <button type="submit" class="btn">Back</button>
+                    </form>
+
+                    <form th:action="@{/events/my}" th:method="get"
+                          sec:authorize="hasAnyRole('EVENT_ORGANIZER','ADMIN')"
+                          style="display:inline;">
+                        <button type="submit" class="btn">Back to Manage</button>
+                    </form>
+                </div>
+
+                <div class="booking-actions" style="margin-top: 1rem;">
+                    <div th:if="${event.availableTickets == 0}" class="sold-out">
+                        SOLD OUT
+                    </div>
+
+                    <div th:unless="${alreadyBooked}">
+                        <form th:if="${event.availableTickets > 0}"
+                              th:action="@{/bookings}" th:method="post"
+                              sec:authorize="isAuthenticated()"
+                              style="display:flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem">
+                            <input type="hidden" name="eventId" th:value="${event.id}"/>
+
+                            <label for="tickets">Tickets:</label>
+                            <input type="number" id="tickets" name="numberOfTickets" value="1" min="1" max="10" style="width: 80px; padding: 0.4rem;" required/>
+
+                            <label for="email">Email :</label>
+                            <input type="email" id="email" name="customerEmail" placeholder="friend@example.com" required/>
+
+                            <label for="phone">Phone :</label>
+                            <input type="text" id="phone" name="customerPhone" placeholder="+359 88 123 4567" required/>
+
+                            <label for="specialRequests">Special Requests :</label>
+                            <textarea id="specialRequests" name="specialRequests" rows="2" maxlength="200" placeholder="Any additional notes..."></textarea>
+
+                            <button type="submit" class="btn btn-primary">Book Tickets</button>
+                        </form>
+                    </div>
+
+                    <a th:if="${event.availableTickets > 0}"
+                       th:href="@{/login}" sec:authorize="isAnonymous()" class="btn btn-primary"
+                       style="margin-bottom: 1rem">
+                        Login to Book
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer th:replace="~{fragments/commons :: footer}"></footer>
+
+    </body>
+</html>
