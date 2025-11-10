@@ -3,7 +3,7 @@ package com.exam.eventhub.web;
 import com.exam.eventhub.category.service.CategoryService;
 import com.exam.eventhub.contact.service.ContactService;
 import com.exam.eventhub.event.service.EventService;
-import com.exam.eventhub.web.dto.ContactMessageBinding;
+import com.exam.eventhub.web.dto.ContactCreateRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -32,7 +32,7 @@ public class IndexController {
     @GetMapping("/events")
     public String allEvents(Model model) {
         model.addAttribute("categories", categoryService.getAll());
-        model.addAttribute("events", eventService.findAll());
+        model.addAttribute("events", eventService.getAll());
         return "events";
     }
 
@@ -44,13 +44,13 @@ public class IndexController {
     @GetMapping("/contact")
     public String showContactForm(Model model) {
         if (!model.containsAttribute("contactMessage")) {
-            model.addAttribute("contactMessage", new ContactMessageBinding());
+            model.addAttribute("contactMessage", new ContactCreateRequest());
         }
         return "contact";
     }
 
     @PostMapping("/contact")
-    public String submitContactForm(@Valid @ModelAttribute("contactMessage") ContactMessageBinding contactMessage,
+    public String submitContactForm(@Valid @ModelAttribute("contactMessage") ContactCreateRequest contactMessage,
                                     BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes) {
 
