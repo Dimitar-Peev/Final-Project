@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Manage Users')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Manage Users</h1>
+                <p>View, edit, block, or unblock users</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div class="dashboard-card">
+                    <h2><i class="fa-solid fa-users"></i> Users List</h2>
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.username}">JohnDoe</td>
+                                <td th:text="${user.email}">john@example.com</td>
+                                <td th:text="${user.role}">USER</td>
+                                <td>
+                                    <span th:if="${!user.blocked}" class="status active">Active</span>
+                                    <span th:if="${user.blocked}" class="status blocked">Blocked</span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <form th:action="@{/admin/users/edit/{id}(id=${user.id})}" th:method="get"
+                                              style="display:inline;">
+                                            <button type="submit" class="btn edit-btn">Edit</button>
+                                        </form>
+
+                                        <form th:action="@{/admin/users/unblock/{id}(id=${user.id})}" th:method="patch"
+                                              th:if="${user.role != 'ADMIN'}">
+                                            <button type="submit" class="btn btn-outline success">Unblock</button>
+                                        </form>
+
+                                        <form th:action="@{/admin/users/block/{id}(id=${user.id})}" th:method="patch"
+                                              th:if="${user.role != 'ADMIN'}">
+                                            <button type="submit" class="btn btn-outline danger">Block</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
