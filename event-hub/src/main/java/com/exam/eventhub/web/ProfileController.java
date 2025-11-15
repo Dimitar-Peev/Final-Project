@@ -83,7 +83,7 @@ public class ProfileController {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, "Profile updated successfully!");
+        redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, UPDATE_SUCCESSFUL.formatted("Profile"));
 
         return "redirect:/profile";
     }
