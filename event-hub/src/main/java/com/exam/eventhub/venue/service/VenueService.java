@@ -19,10 +19,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.exam.eventhub.common.Constants.*;
+
 @Slf4j
 @Service
 @AllArgsConstructor
 public class VenueService {
+
+    private static final String ENTITY_NAME = "Venue";
 
     private final VenueRepository venueRepository;
 
@@ -143,17 +147,18 @@ public class VenueService {
 
         this.venueRepository.delete(venue);
 
-        log.info("Venue with ID [{}] was successfully deleted.", id);
+        String message = ID_DELETED_SUCCESSFUL.formatted(ENTITY_NAME, id);
+        log.info(message);
     }
 
     public Venue getById(UUID id) {
         return this.venueRepository.findById(id)
-                .orElseThrow(() -> new VenueNotFoundException("Venue with ID [%s] was not found.".formatted(id)));
+                .orElseThrow(() -> new VenueNotFoundException(ID_NOT_FOUND.formatted(ENTITY_NAME, id)));
     }
 
     public Venue getByName(String name) {
         return this.venueRepository.findByName(name)
-                .orElseThrow(() -> new VenueNotFoundException("Venue with name [%s] was not found.".formatted(name)));
+                .orElseThrow(() -> new VenueNotFoundException(NAME_NOT_FOUND.formatted(ENTITY_NAME, name)));
     }
 
 }
