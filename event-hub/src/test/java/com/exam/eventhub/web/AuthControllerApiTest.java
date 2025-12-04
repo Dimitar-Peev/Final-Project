@@ -1,13 +1,15 @@
 package com.exam.eventhub.web;
 
+import com.exam.eventhub.config.TestMvcConfig;
+import com.exam.eventhub.config.TestSecurityConfig;
 import com.exam.eventhub.user.model.Role;
 import com.exam.eventhub.user.service.UserService;
 import com.exam.eventhub.web.dto.LoginRequest;
 import com.exam.eventhub.web.dto.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -23,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import({TestMvcConfig.class, TestSecurityConfig.class})
 public class AuthControllerApiTest {
 
     @MockitoBean
