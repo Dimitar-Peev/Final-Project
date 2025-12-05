@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.exam.eventhub.common.Constants.ID_DELETED_SUCCESSFUL;
-import static com.exam.eventhub.common.Constants.ID_NOT_FOUND;
+import static com.exam.eventhub.common.Constants.*;
 
 @Slf4j
 @Service
@@ -270,7 +269,7 @@ public class EventService {
 
         User user = userService.getByUsername(username);
         if (!user.getRole().equals(Role.ADMIN) && !event.getOrganizer().getUsername().equals(username)) {
-            throw new SecurityException("You are not allowed to edit this event.");
+            throw new SecurityException(NOT_ALLOWED.formatted("edit"));
         }
 
         Venue venue = venueService.getById(model.getVenueId());
@@ -281,7 +280,6 @@ public class EventService {
         event.setStartDate(model.getStartDate());
         event.setEndDate(model.getEndDate());
         event.setTicketPrice(model.getTicketPrice());
-        event.setMaxCapacity(model.getMaxCapacity());
         event.setVenue(venue);
         event.setCategory(category);
 
@@ -291,6 +289,8 @@ public class EventService {
         if (newAvailableTickets < 0) {
             throw new IllegalStateException("Cannot reduce capacity below sold tickets");
         }
+
+        event.setMaxCapacity(model.getMaxCapacity());
         event.setAvailableTickets(newAvailableTickets);
 
         eventRepository.save(event);
