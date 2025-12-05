@@ -17,10 +17,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.exam.eventhub.common.Constants.*;
+
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CategoryService {
+
+    private static final String ENTITY_NAME = "Category";
 
     private final CategoryRepository categoryRepository;
 
@@ -89,7 +93,6 @@ public class CategoryService {
 
     @CacheEvict(value = "categories", allEntries = true)
     public Category update(UUID id, CategoryEditRequest categoryEditRequest) {
-
         Category category = getById(id);
 
         category.setName(categoryEditRequest.getName());
@@ -109,16 +112,17 @@ public class CategoryService {
 
         this.categoryRepository.delete(category);
 
-        log.info("Category with ID [{}] was successfully deleted.", id);
+        String message = ID_DELETED_SUCCESSFUL.formatted(ENTITY_NAME, id);
+        log.info(message);
     }
 
     public Category getById(UUID id) {
         return this.categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Category with ID [%s] was not found.".formatted(id)));
+                .orElseThrow(() -> new CategoryNotFoundException(ID_NOT_FOUND.formatted(ENTITY_NAME, id)));
     }
 
     public Category getByName(String name) {
         return this.categoryRepository.findByName(name)
-                .orElseThrow(() -> new CategoryNotFoundException("Category with name [%s] was not found.".formatted(name)));
+                .orElseThrow(() -> new CategoryNotFoundException(NAME_NOT_FOUND.formatted(ENTITY_NAME, name)));
     }
 }
