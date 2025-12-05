@@ -2,12 +2,17 @@ package com.exam.eventhub.web;
 
 import com.exam.eventhub.category.model.Category;
 import com.exam.eventhub.category.service.CategoryService;
+import com.exam.eventhub.config.TestMvcConfig;
+import com.exam.eventhub.config.TestSecurityConfig;
+import com.exam.eventhub.security.AuthenticationMetadata;
+import com.exam.eventhub.user.model.Role;
 import com.exam.eventhub.venue.model.Venue;
 import com.exam.eventhub.venue.service.VenueService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -15,13 +20,15 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HomeController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import({TestMvcConfig.class, TestSecurityConfig.class})
 public class HomeControllerApiTest {
 
     @MockitoBean
@@ -31,6 +38,17 @@ public class HomeControllerApiTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    private AuthenticationMetadata adminPrincipal;
+    private AuthenticationMetadata principal;
+
+    @BeforeEach
+    void setup() {
+        adminPrincipal = new AuthenticationMetadata
+                (UUID.randomUUID(), "adminUser", "password", Role.ADMIN, false, null);
+        principal = new AuthenticationMetadata
+                (UUID.randomUUID(), "testUser", "password", Role.USER, false, null);
+    }
 
     @Test
     void getCategories_shouldReturnCategoriesView() throws Exception {
@@ -75,11 +93,23 @@ public class HomeControllerApiTest {
     @Test
     void getAdminDashboard_shouldReturnDashboardView() throws Exception {
 
-        MockHttpServletRequestBuilder request = get("/admin");
+        MockHttpServletRequestBuilder request = get("/admin")
+                .with(user(adminPrincipal));
 
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().isOk())
                 .andExpect(view().name("admin/dashboard"));
+    }
+
+    @Test
+    void getUnauthorizedRequestToAdminDashboard_returnsForbidden() throws Exception {
+
+        MockHttpServletRequestBuilder request = get("/admin", UUID.randomUUID())
+                .with(user(principal));
+
+        ResultActions response = mockMvc.perform(request);
+
+        response.andExpect(status().isForbidden());
     }
 }
