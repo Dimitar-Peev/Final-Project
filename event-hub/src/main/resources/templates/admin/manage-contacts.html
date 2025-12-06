@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Manage Contacts')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Manage Contacts</h1>
+                <p>View, edit, delete contacts</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div class="dashboard-card">
+                    <h2><i class="fa-solid fa-users"></i> Contacts List</h2>
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                                <th>Created at:</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="contact : ${allContacts}">
+                                <td th:text="${contact.name}">JohnDoe</td>
+                                <td th:text="${contact.email}">john@example.com</td>
+                                <td th:text="${contact.message}">USER</td>
+                                <td th:text="${#temporals.format(contact.createdAt, 'dd MMM yyyy HH:mm')}"></td>
+                                <td>
+                                    <div class="action-buttons">
+                                       <form action="" method="get" style="display:inline;">
+                                            <button type="submit" class="btn btn-outline danger"
+                                                    onclick="return confirm('Are you sure you want to delete this contact?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
