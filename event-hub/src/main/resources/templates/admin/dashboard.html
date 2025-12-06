@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Admin Dashboard')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Admin Dashboard</h1>
+                <p>Manage users, categories, and venues</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-users"></i> Users</h2>
+                            <p>Manage users: view, block, unblock, and edit profiles.</p>
+                        </div>
+                        <a th:href="@{/admin/users}" class="btn btn-primary">Manage Users</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-tags"></i> Categories</h2>
+                            <p>Manage event categories: add, update, and delete.</p>
+                        </div>
+                        <a th:href="@{/admin/categories}" class="btn btn-primary">Manage Categories</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-building"></i> Venues</h2>
+                            <p>Manage event venues: add, update, and delete locations.</p>
+                        </div>
+                        <a th:href="@{/admin/venues}" class="btn btn-primary">Manage Venues</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-calendar-days"></i> Events</h2>
+                            <p>Manage all events: review, update, and delete.</p>
+                        </div>
+                        <a th:href="@{/events/my}" class="btn btn-primary">Manage Events</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-address-book"></i> Contacts</h2>
+                            <p>Manage all contacts: view, update, and delete.</p>
+                        </div>
+                        <a th:href="@{/admin/contacts}" class="btn btn-primary">Manage Contacts</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-ticket"></i> Bookings</h2>
+                            <p>Manage all bookings: cancel, refund.</p>
+                        </div>
+                        <a th:href="@{/admin/bookings}" class="btn btn-primary">Manage Bookings</a>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2><i class="fa-solid fa-bell"></i>Notifications</h2>
+                            <p>Manage Notifications: view, delete.</p>
+                        </div>
+                        <a th:href="@{/admin/notifications}" class="btn btn-primary">Manage Notifications</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
