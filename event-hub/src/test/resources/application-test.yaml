@@ -1,0 +1,29 @@
+spring:
+  application:
+     name: Event Hub
+  mvc:
+    hidden method:
+      filter:
+        enabled: 'true'
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: 'true'
+  security:
+    user:
+      name: '111'
+      password: '123123'
+
+eventhub:
+  notification-service:
+    base-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8081}
+  payment-service:
+    base-url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
