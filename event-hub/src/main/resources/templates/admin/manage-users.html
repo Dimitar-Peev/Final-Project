@@ -19,6 +19,11 @@
 
                 <div class="dashboard-card">
                     <h2><i class="fa-solid fa-users"></i> Users List</h2>
+
+                    <div th:if="${successMessage}" class="alert success" style="margin-bottom: 2rem;">
+                        <p th:text="${successMessage}"></p>
+                    </div>
+
                     <table class="dashboard-table">
                         <thead>
                             <tr>
@@ -40,19 +45,17 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <form th:action="@{/admin/users/edit/{id}(id=${user.id})}" th:method="get"
+                                        <form th:action="@{/admin/users/{id}/edit(id=${user.id})}" th:method="get"
                                               style="display:inline;">
                                             <button type="submit" class="btn edit-btn">Edit</button>
                                         </form>
 
-                                        <form th:action="@{/admin/users/unblock/{id}(id=${user.id})}" th:method="patch"
+                                        <form th:action="@{/admin/users/{id}/status(id=${user.id})}" th:method="patch"
                                               th:if="${user.role != 'ADMIN'}">
-                                            <button type="submit" class="btn btn-outline success">Unblock</button>
-                                        </form>
-
-                                        <form th:action="@{/admin/users/block/{id}(id=${user.id})}" th:method="patch"
-                                              th:if="${user.role != 'ADMIN'}">
-                                            <button type="submit" class="btn btn-outline danger">Block</button>
+                                            <button type="submit" class="btn btn-outline"
+                                                    th:classappend="${user.blocked} ? 'success' : 'danger'"
+                                                    th:text="${user.blocked} ? 'Unblock' : 'Block'">
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
