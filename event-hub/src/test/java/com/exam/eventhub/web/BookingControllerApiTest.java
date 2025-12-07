@@ -29,6 +29,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BookingController.class)
@@ -141,7 +142,7 @@ class BookingControllerApiTest {
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/bookings/confirmation/" + bookingId))
+                .andExpect(redirectedUrl("/bookings/" + bookingId + "/confirmation"))
                 .andExpect(flash().attributeExists("booking"))
                 .andExpect(flash().attribute("booking", mockBooking));
 
@@ -204,7 +205,7 @@ class BookingControllerApiTest {
 
         when(bookingService.getById(bookingId)).thenReturn(mockBooking);
 
-        MockHttpServletRequestBuilder request = get("/bookings/confirmation/" + bookingId)
+        MockHttpServletRequestBuilder request = get("/bookings/{id}/confirmation", bookingId)
                 .with(user(principal));
 
         ResultActions response = mockMvc.perform(request);
@@ -222,7 +223,7 @@ class BookingControllerApiTest {
 
         UUID bookingId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = get("/bookings/confirmation/" + bookingId);
+        MockHttpServletRequestBuilder request = get("/bookings/{id}/confirmation", bookingId);
 
         ResultActions response = mockMvc.perform(request);
 
@@ -236,7 +237,7 @@ class BookingControllerApiTest {
 
         UUID bookingId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = post("/bookings/cancel/" + bookingId)
+        MockHttpServletRequestBuilder request = delete("/bookings/" + bookingId)
                 .with(user(principal))
                 .with(csrf());
 
