@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Edit User')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Edit User</h1>
+                <p>Update user information and role</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard2">
+            <div class="container form-container">
+                <form th:action="@{/admin/users/{id}(id=${user.id})}" th:object="${user}" th:method="put"
+                      class="event-form">
+
+                    <div th:if="${errorMessage}" class="alert alert-danger">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" th:field="*{username}">
+                        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"
+                               style="font-size: 15px">Username error message</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" th:field="*{email}">
+                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"
+                               style="font-size: 15px">Error message</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input id="firstName" type="text" th:field="*{firstName}">
+                        <small th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error-message"
+                               style="font-size: 15px">Error message</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input id="lastName" type="text" th:field="*{lastName}">
+                        <small th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error-message"
+                               style="font-size: 15px">Error message</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input id="phoneNumber" type="text" th:field="*{phoneNumber}">
+                        <small th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"
+                               class="error-message" style="font-size: 15px">Error message</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" th:field="*{role}">
+                            <option th:each="userRole : ${T(com.exam.eventhub.user.model.Role).values()}"
+                                    th:text="${userRole}"
+                                    th:value="${userRole}"
+                            >
+                                Role
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a th:href="@{/admin/users}" class="btn btn-primary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
