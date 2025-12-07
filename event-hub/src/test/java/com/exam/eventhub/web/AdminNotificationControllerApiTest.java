@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -61,7 +62,9 @@ public class AdminNotificationControllerApiTest {
 
         List<NotificationResponse> mockNotifications = Arrays.asList(notification1, notification2, notification3);
 
-        when(notificationService.getAll()).thenReturn(mockNotifications);
+        ResponseEntity<List<NotificationResponse>> responseEntity = ResponseEntity.ok(mockNotifications);
+
+        when(notificationService.getAll()).thenReturn(responseEntity);
 
         MockHttpServletRequestBuilder request = get("/admin/notifications")
                 .with(user(adminPrincipal));
@@ -79,7 +82,9 @@ public class AdminNotificationControllerApiTest {
     @Test
     void getViewNotificationsWithEmptyList_returnsViewWithEmptyList() throws Exception {
 
-        when(notificationService.getAll()).thenReturn(Collections.emptyList());
+        ResponseEntity<List<NotificationResponse>> emptyResponse = ResponseEntity.ok(Collections.emptyList());
+
+        when(notificationService.getAll()).thenReturn(emptyResponse);
 
         MockHttpServletRequestBuilder request = get("/admin/notifications")
                 .with(user(adminPrincipal));
