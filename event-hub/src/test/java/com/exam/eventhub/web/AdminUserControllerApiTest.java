@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static com.exam.eventhub.common.Constants.SUCCESS_MESSAGE_ATTR;
 import static com.exam.eventhub.util.ApiHelper.createMockUser;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -114,7 +115,7 @@ public class AdminUserControllerApiTest {
 
         when(userService.getById(targetUserId)).thenReturn(mockUser);
 
-        MockHttpServletRequestBuilder request = get("/admin/users/edit/" + targetUserId)
+        MockHttpServletRequestBuilder request = get("/admin/users/{id}/edit", targetUserId)
                 .with(user(adminPrincipal));
 
         ResultActions response = mockMvc.perform(request);
@@ -132,7 +133,7 @@ public class AdminUserControllerApiTest {
 
         UUID targetUserId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = get("/admin/users/edit/" + targetUserId)
+        MockHttpServletRequestBuilder request = get("/admin/users/{id}/edit", targetUserId)
                 .with(user(principal));
 
         ResultActions response = mockMvc.perform(request);
@@ -147,7 +148,7 @@ public class AdminUserControllerApiTest {
 
         UUID targetUserId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = put("/admin/users/edit/" + targetUserId)
+        MockHttpServletRequestBuilder request = put("/admin/users/" + targetUserId)
                 .param("username", "updatedUser")
                 .param("email", "updated@example.com")
                 .param("firstName", "Updated")
@@ -168,7 +169,7 @@ public class AdminUserControllerApiTest {
 
         UUID targetUserId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = put("/admin/users/edit/" + targetUserId)
+        MockHttpServletRequestBuilder request = put("/admin/users/" + targetUserId)
                 .param("username", "updatedUser")
                 .param("email", "updated@example.com")
                 .with(user(principal))
@@ -182,98 +183,89 @@ public class AdminUserControllerApiTest {
     }
 
     @Test
-    void patchAuthenticatedAdminRequestToBlockUser_blocksUserAndRedirects() throws Exception {
+    void patchAuthenticatedAdminRequestToToggleUserStatus_whenUserIsNotBlocked_blocksUserAndRedirects() throws Exception {
 
         UUID targetUserId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = patch("/admin/users/block/" + targetUserId)
+        User mockUser = new User();
+        mockUser.setId(targetUserId);
+        mockUser.setBlocked(false);
+        when(userService.getById(targetUserId)).thenReturn(mockUser);
+
+        MockHttpServletRequestBuilder request = patch("/admin/users/{id}/status", targetUserId)
                 .with(user(adminPrincipal))
                 .with(csrf());
 
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/users"));
+                .andExpect(redirectedUrl("/admin/users"))
+                .andExpect(flash().attributeExists(SUCCESS_MESSAGE_ATTR))
+                .andExpect(flash().attribute(SUCCESS_MESSAGE_ATTR, "User blocked successfully!"));
 
+        verify(userService, times(1)).getById(targetUserId);
         verify(userService, times(1)).blockUser(targetUserId);
-    }
-
-    @Test
-    void patchAuthenticatedNonAdminRequestToBlockUser_returnsForbidden() throws Exception {
-
-        UUID targetUserId = UUID.randomUUID();
-
-        MockHttpServletRequestBuilder request = patch("/admin/users/block/" + targetUserId)
-                .with(user(principal))
-                .with(csrf());
-
-        ResultActions response = mockMvc.perform(request);
-
-        response.andExpect(status().isForbidden());
-
-        verify(userService, never()).blockUser(any());
-    }
-
-    @Test
-    void patchUnauthenticatedRequestToBlockUser_returnsForbidden() throws Exception {
-
-        UUID targetUserId = UUID.randomUUID();
-
-        MockHttpServletRequestBuilder request = patch("/admin/users/block/" + targetUserId)
-                .with(csrf());
-
-        ResultActions response = mockMvc.perform(request);
-
-        response.andExpect(status().isForbidden());
-
-        verify(userService, never()).blockUser(any());
-    }
-
-    @Test
-    void patchAuthenticatedAdminRequestToUnblockUser_unblocksUserAndRedirects() throws Exception {
-
-        UUID targetUserId = UUID.randomUUID();
-
-        MockHttpServletRequestBuilder request = patch("/admin/users/unblock/" + targetUserId)
-                .with(user(adminPrincipal))
-                .with(csrf());
-
-        ResultActions response = mockMvc.perform(request);
-
-        response.andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/users"));
-
-        verify(userService, times(1)).unblockUser(targetUserId);
-    }
-
-    @Test
-    void patchAuthenticatedNonAdminRequestToUnblockUser_returnsForbidden() throws Exception {
-
-        UUID targetUserId = UUID.randomUUID();
-
-        MockHttpServletRequestBuilder request = patch("/admin/users/unblock/" + targetUserId)
-                .with(user(principal))
-                .with(csrf());
-
-        ResultActions response = mockMvc.perform(request);
-
-        response.andExpect(status().isForbidden());
-
         verify(userService, never()).unblockUser(any());
     }
 
     @Test
-    void patchUnauthenticatedRequestToUnblockUser_returnsForbidden() throws Exception {
+    void patchAuthenticatedAdminRequestToToggleUserStatus_whenUserIsBlocked_unblocksUserAndRedirects() throws Exception {
 
         UUID targetUserId = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = patch("/admin/users/unblock/" + targetUserId)
+        User mockUser = new User();
+        mockUser.setId(targetUserId);
+        mockUser.setBlocked(true);
+        when(userService.getById(targetUserId)).thenReturn(mockUser);
+
+        MockHttpServletRequestBuilder request = patch("/admin/users/{id}/status", targetUserId)
+                .with(user(adminPrincipal))
+                .with(csrf());
+
+        ResultActions response = mockMvc.perform(request);
+
+        response.andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/users"))
+                .andExpect(flash().attributeExists(SUCCESS_MESSAGE_ATTR))
+                .andExpect(flash().attribute(SUCCESS_MESSAGE_ATTR, "User unblocked successfully!"));
+
+        verify(userService, times(1)).getById(targetUserId);
+        verify(userService, times(1)).unblockUser(targetUserId);
+        verify(userService, never()).blockUser(any());
+    }
+
+    @Test
+    void patchAuthenticatedNonAdminRequestToToggleUserStatus_returnsForbidden() throws Exception {
+
+        UUID targetUserId = UUID.randomUUID();
+
+        MockHttpServletRequestBuilder request = patch("/admin/users/{id}/status", targetUserId)
+                .with(user(principal))
                 .with(csrf());
 
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().isForbidden());
 
+        verify(userService, never()).getById(any());
+        verify(userService, never()).blockUser(any());
+        verify(userService, never()).unblockUser(any());
+    }
+
+    @Test
+    void patchUnauthenticatedRequestToToggleUserStatus_returnsForbidden() throws Exception {
+
+        UUID targetUserId = UUID.randomUUID();
+
+        MockHttpServletRequestBuilder request = patch("/admin/users/{id}/status", targetUserId)
+                .with(csrf());
+
+        ResultActions response = mockMvc.perform(request);
+
+        response.andExpect(status().isForbidden());
+
+        verify(userService, never()).getById(any());
+        verify(userService, never()).blockUser(any());
         verify(userService, never()).unblockUser(any());
     }
 
