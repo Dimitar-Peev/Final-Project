@@ -24,6 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminBookingController.class)
@@ -66,7 +67,7 @@ public class AdminBookingControllerApiTest {
 
         UUID id = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = post("/admin/bookings/{id}/cancel", id)
+        MockHttpServletRequestBuilder request = delete("/admin/bookings/{id}", id)
                 .with(user(adminPrincipal))
                 .with(csrf());
 
@@ -84,7 +85,7 @@ public class AdminBookingControllerApiTest {
 
         UUID id = UUID.randomUUID();
 
-        MockHttpServletRequestBuilder request = post("/admin/bookings/{id}/refund", id)
+        MockHttpServletRequestBuilder request = post("/admin/bookings/{id}/refunds", id)
                 .with(user(adminPrincipal))
                 .with(csrf());
 
