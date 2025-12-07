@@ -9,10 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -38,8 +35,8 @@ public class BookingController {
     }
 
     @PostMapping
-    public String createBooking(@Valid BookingCreateRequest bookingCreateRequest, BindingResult bindingResult,
-                                Principal principal, RedirectAttributes redirectAttributes) {
+    public String createBooking(@Valid @ModelAttribute("bookingCreateRequest") BookingCreateRequest bookingCreateRequest,
+                                BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("bookingCreateRequest", bookingCreateRequest);
@@ -50,17 +47,19 @@ public class BookingController {
 
         Booking booking = bookingService.add(bookingCreateRequest, principal.getName());
         redirectAttributes.addFlashAttribute("booking", booking);
-        return "redirect:/bookings/confirmation/" + booking.getId();
+
+        String redirectUrl = "redirect:/bookings/%s/confirmation".formatted(booking.getId());
+        return redirectUrl;
     }
 
-    @GetMapping("/confirmation/{id}")
+    @GetMapping("/{id}/confirmation")
     public String showBookingConfirmation(@PathVariable UUID id, Model model) {
         Booking booking = bookingService.getById(id);
         model.addAttribute("booking", booking);
         return "booking-confirmation";
     }
 
-    @PostMapping("/cancel/{id}")
+    @DeleteMapping("/{id}")
     public String cancelBooking(@PathVariable UUID id, Principal principal, RedirectAttributes redirectAttributes) {
         bookingService.cancelBooking(id, principal.getName());
         redirectAttributes.addFlashAttribute(SUCCESS_MESSAGE_ATTR, "Booking cancelled successfully!");
