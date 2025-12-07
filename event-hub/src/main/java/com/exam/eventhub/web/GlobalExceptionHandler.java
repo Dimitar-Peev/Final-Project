@@ -71,6 +71,13 @@ public class GlobalExceptionHandler {
         return "redirect:/admin/venues/" + ex.getVenueId();
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public String handleUnauthorizedException(UnauthorizedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Unauthorized access attempt: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, ex.getMessage());
+        return "redirect:/notifications";
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({
             BookingNotFoundException.class,
