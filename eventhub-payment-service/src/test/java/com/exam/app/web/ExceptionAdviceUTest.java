@@ -70,6 +70,7 @@ public class ExceptionAdviceUTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(errorMessage, response.getBody().getMessage());
     }
 }
