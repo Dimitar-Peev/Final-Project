@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Payment Service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/eventhub_payments?createDatabaseIfNotExist=true
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8082
