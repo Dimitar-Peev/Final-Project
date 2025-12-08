@@ -1,0 +1,33 @@
+### Process Payment
+POST http://localhost:8082/api/v1/payments
+Content-Type: application/json
+
+{
+	"bookingId": "b77c7b3d-5bcb-4e60-b1c1-b514edc88a1a",
+	"userId": "a1e76d0a-7a3f-4d8c-9e34-9d635ba96c3b",
+	"amount": 50.00
+}
+
+### Refund Payment
+POST http://localhost:8082/api/v1/payments/4174ee9b-1777-4587-83ac-efd86eccbb30/refunds
+Content-Type: application/json
+
+{
+	"amount": 50.00
+}
+
+### Get Payment by Booking ID
+GET http://localhost:8082/api/v1/payments/bookings/b77c7b3d-5bcb-4e60-b1c1-b514edc88a1a
+
+### Get Payment by Payment ID
+GET http://localhost:8082/api/v1/payments/1f064b8b-42ab-4c20-9efd-52c5137d51d6
+
+### Get All Payments for a Specific User
+GET http://localhost:8082/api/v1/payments/users/a1e76d0a-7a3f-4d8c-9e34-9d635ba96c3b
+
+### Get All Payments
+GET http://localhost:8082/api/v1/payments
+
+### Invalid example (for error testing)
+#(example for missing paymentId, will return 404)
+GET http://localhost:8082/api/v1/payments/00000000-0000-0000-0000-000000000000
