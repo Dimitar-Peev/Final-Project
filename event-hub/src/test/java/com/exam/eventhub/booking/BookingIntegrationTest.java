@@ -25,6 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -85,13 +86,13 @@ public class BookingIntegrationTest {
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/bookings/confirmation/" + bookingId));
+                .andExpect(redirectedUrl("/bookings/" + bookingId + "/confirmation"));
     }
 
     private void viewConfirmation(UUID bookingId, Booking mockBooking) throws Exception {
         when(bookingService.getById(bookingId)).thenReturn(mockBooking);
 
-        MockHttpServletRequestBuilder request = get("/bookings/confirmation/" + bookingId)
+        MockHttpServletRequestBuilder request = get("/bookings/{id}/confirmation", bookingId)
                 .with(user(principal));
 
         ResultActions response = mockMvc.perform(request);
@@ -115,7 +116,7 @@ public class BookingIntegrationTest {
     private void cancelBooking(UUID bookingId, String username) throws Exception {
         doNothing().when(bookingService).cancelBooking(bookingId, username);
 
-        MockHttpServletRequestBuilder request = post("/bookings/cancel/" + bookingId)
+        MockHttpServletRequestBuilder request = delete("/bookings/" + bookingId)
                 .with(user(principal))
                 .with(csrf());
 
