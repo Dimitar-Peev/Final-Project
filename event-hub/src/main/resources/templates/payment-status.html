@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{fragments/commons :: head('Payment Status')}"></head>
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1 th:text="${success} ? 'Payment Successful!' : 'Payment Failed'"></h1>
+                <p th:if="${success}">Thank you for your payment. Your booking is now confirmed.</p>
+                <p th:if="${!success}">Something went wrong while processing your payment.</p>
+            </div>
+        </section>
+
+        <section class="booking-status">
+            <div class="container">
+                <div class="booking-summary" th:if="${booking != null}">
+                    <h2>Your Booking</h2>
+                    <ul>
+                        <li><strong>Event:</strong> <span th:text="${booking.event.title}">Event Name</span></li>
+                        <li><strong>Status:</strong>
+                            <span th:text="${booking.status}"
+                                  th:class="'status ' + ${booking.status.name().toLowerCase()}"></span>
+                        </li>
+                        <li><strong>Total Paid:</strong>
+                            <span th:text="${#numbers.formatDecimal(booking.totalAmount, 1, 2)} + ' BGN'">0.00</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="actions">
+                    <a href="/bookings/my" class="btn btn-primary">Go to My Bookings</a>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
