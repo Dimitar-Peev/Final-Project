@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Payment History')}"></head>
+    <link rel="stylesheet" th:href="@{/css/payment-history.css}" >
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Payment History</h1>
+                <p>View and manage your payment history</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div th:if="${successMessage}" class="alert success" style="margin-bottom: 2rem;">
+                    <p th:text="${successMessage}"></p>
+                </div>
+
+                <div th:if="${infoMessage}" class="alert danger">
+                    <p th:text="${infoMessage}"></p>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <h2><i class="fa-solid fa-credit-card"></i> Your Payments</h2>
+                    </div>
+
+                    <table class="dashboard-table" th:if="${payments != null and !payments.isEmpty()}">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Event / Booking</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${payments}">
+                                <td th:text="${p.paymentId}">ID</td>
+                                <td th:text="${p.bookingId}">Booking</td>
+                                <td th:text="${p.amount + ' BGN'}">Amount</td>
+                                <td>
+                                    <span th:class="'status ' + ${p.status.toLowerCase()}"
+                                          th:text="${p.status}">SUCCESS</span>
+                                </td>
+                                <td th:text="${#temporals.format(p.createdOn, 'dd MMM yyyy HH:mm')}">Date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div th:if="${payments == null or payments.isEmpty()}" class="no-events">
+                        <h3>No payments found</h3>
+                        <p>You have no payment history at the moment.</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
