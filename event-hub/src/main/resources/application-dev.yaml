@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: Event Hub
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Europe/Sofia
+        format_sql: 'true'
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: 'true'
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: never
+  mvc:
+    hidden method:
+      filter:
+        enabled: 'true'
+    log-resolved-exception: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/event-hub?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=Europe/Sofia
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      static-locations:
+        - classpath:/static/
+        - file:uploads/
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor: TRACE
+        SQL: DEBUG
+server:
+  port: 8080
+
+eventhub:
+  notification-service:
+    base-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8081}
+  payment-service:
+    base-url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
