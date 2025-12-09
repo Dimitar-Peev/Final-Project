@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Manage Bookings')}"></head>
+    <link rel="stylesheet" th:href="@{/css/manage-bookings.css}" >
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>Manage Bookings</h1>
+                <p>Cancel or refund user bookings</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div class="dashboard-card">
+                    <h2><i class="fa-solid fa-ticket"></i> Bookings List</h2>
+
+                    <div th:if="${successMessage}" class="alert alert-success">
+                        <span th:text="${successMessage}"></span>
+                    </div>
+                    <div th:if="${errorMessage}" class="alert alert-danger">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>User</th>
+                                <th>Tickets</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="booking : ${bookings}">
+                                <td th:text="${booking.event.title}">Event Title</td>
+                                <td th:text="${booking.user.username}">JohnDoe</td>
+                                <td th:text="${booking.numberOfTickets}">2</td>
+                                <td th:text="${#numbers.formatDecimal(booking.totalAmount, 1, 2) + ' BGN / '
+                                    + #numbers.formatDecimal(booking.totalAmount / 1.95583, 1, 2) + ' EUR'}">50.00</td>
+                                <td class="date-col" th:text="${#temporals.format(booking.bookingDate, 'dd MMM yyyy')}" >
+                                    Jan 15, 2025 19:00
+                                </td>
+                                <td>
+                                    <span th:text="${booking.status.displayName}"
+                                          th:class="'status ' + ${booking.status.name().toLowerCase()}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+
+                                        <form th:action="@{/admin/bookings/{id}(id=${booking.id})}" th:method="delete"
+                                              th:if="${booking.status.name() == 'PENDING'}">
+                                            <button type="submit" class="btn cancel">Cancel</button>
+                                        </form>
+
+                                        <form th:action="@{/admin/bookings/{id}/refunds(id=${booking.id})}" th:method="post"
+                                              th:if="${booking.status.name() == 'CONFIRMED'}">
+                                            <button type="submit" class="btn refund">Refund</button>
+                                        </form>
+
+                                        <span th:if="${booking.status.name() == 'CANCELLED'}"
+                                              style="color:#9ca3af;font-style:italic;">
+                                            No actions
+                                        </span>
+                                        <span th:if="${booking.status.name() == 'REFUNDED'}"
+                                              style="color:#9ca3af;font-style:italic;">
+                                            No actions
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
