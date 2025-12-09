@@ -1,0 +1,30 @@
+### User Notification
+POST http://localhost:8081/api/v1/notifications
+Content-Type: application/json
+
+{
+	"recipientId": "8c69e438-21b3-4c9b-b10d-5a3f5c0a0a77",
+	"recipientEmail": "user@example.com",
+	"subject": "Booking Confirmed",
+	"message": "Your booking for Java Conference 2025 was successfully confirmed!"
+}
+
+### Admin Get All Notifications
+GET http://localhost:8081/api/v1/notifications
+Accept: application/json
+
+### User Get Notifications by User ID
+GET http://localhost:8081/api/v1/notifications/8c69e438-21b3-4c9b-b10d-5a3f5c0a0a77
+Accept: application/json
+
+### User Delete Notification by ID
+DELETE http://localhost:8081/api/v1/notifications/123e4de8-7e9f-4355-8b67-580bf20ae551
+Content-Type: application/json
+
+### User Delete All Notifications by User ID
+DELETE http://localhost:8081/api/v1/notifications?userId=8c69e438-21b3-4c9b-b10d-5a3f5c0a0a77
+Content-Type: application/json
+
+### Invalid example (for error testing)
+#(example for missing notification, will return 404)
+DELETE http://localhost:8081/api/v1/notifications/00000000-0000-0000-0000-000000000000
