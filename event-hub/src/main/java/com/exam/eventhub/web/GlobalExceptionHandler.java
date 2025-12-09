@@ -78,6 +78,42 @@ public class GlobalExceptionHandler {
         return "redirect:/notifications";
     }
 
+    @ExceptionHandler(BookingAlreadyConfirmedException.class)
+    public String handleBookingAlreadyConfirmed(BookingAlreadyConfirmedException ex, RedirectAttributes redirectAttributes) {
+        log.warn("Booking already confirmed: {}", ex.getMessage());
+        redirectAttributes.addFlashAttribute(INFO_MESSAGE_ATTR, "This booking is already confirmed!");
+        return "redirect:/bookings/my";
+    }
+
+    @ExceptionHandler(PaymentProcessingException.class)
+    public String handlePaymentProcessing(PaymentProcessingException ex, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        log.error("Payment processing failed: {}", ex.getMessage());
+
+        String uri = request.getRequestURI();
+        String bookingId = extractBookingIdFromUri(uri);
+
+        redirectAttributes.addFlashAttribute(ERROR_MESSAGE_ATTR, "Payment failed: " + ex.getMessage());
+
+        if (bookingId != null) {
+            return "redirect:/payments/bookings/" + bookingId + "/status?success=false";
+        } else {
+            return "redirect:/bookings/my";
+        }
+    }
+
+    private String extractBookingIdFromUri(String uri) {
+        try {
+            if (uri.contains("/bookings/")) {
+                int start = uri.indexOf("/bookings/") + 10;
+                int end = uri.length();
+                return uri.substring(start, end);
+            }
+        } catch (Exception e) {
+            log.warn("Could not extract bookingId from URI: {}", uri, e);
+        }
+        return null;
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({
             BookingNotFoundException.class,
