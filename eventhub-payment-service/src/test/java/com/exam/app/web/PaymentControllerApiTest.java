@@ -47,14 +47,6 @@ public class PaymentControllerApiTest {
         Payment mockPayment = createMockPayment();
         when(paymentService.processPayment(any(Payment.class))).thenReturn(mockPayment);
 
-//        String requestBody = """
-//                {
-//                    "bookingId": "123e4567-e89b-12d3-a456-426614174000",
-//                    "userId": "223e4567-e89b-12d3-a456-426614174001",
-//                    "amount": 150.00
-//                }
-//                """;
-
         Payment payment = new Payment();
         payment.setId(UUID.randomUUID());
         payment.setBookingId(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
@@ -64,9 +56,7 @@ public class PaymentControllerApiTest {
 
         MockHttpServletRequestBuilder request = post("/api/v1/payments")
                 .contentType(MediaType.APPLICATION_JSON)
-//                .content(requestBody); // Работи със String
-                .content(objectMapper.writeValueAsBytes(payment)); // Работи със Object
-
+                .content(objectMapper.writeValueAsBytes(payment));
         ResultActions response = mockMvc.perform(request);
 
         response.andExpect(status().isCreated())
@@ -89,18 +79,11 @@ public class PaymentControllerApiTest {
 
         when(paymentService.refundPayment(paymentId, amount)).thenReturn(mockPayment);
 
-//        String requestBody = """
-//                {
-//                    "amount": 150.00
-//                }
-//                """;
-
         RefundRequest refundRequest = new RefundRequest();
         refundRequest.setAmount(amount);
 
         MockHttpServletRequestBuilder request = post("/api/v1/payments/{paymentId}/refunds", paymentId)
                 .contentType(MediaType.APPLICATION_JSON)
-//                .content(requestBody);
                 .content(objectMapper.writeValueAsBytes(refundRequest));
 
         ResultActions response = mockMvc.perform(request);
