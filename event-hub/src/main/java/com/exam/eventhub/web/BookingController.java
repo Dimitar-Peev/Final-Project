@@ -2,6 +2,7 @@ package com.exam.eventhub.web;
 
 import com.exam.eventhub.booking.model.Booking;
 import com.exam.eventhub.booking.service.BookingService;
+import com.exam.eventhub.exception.UnauthorizedException;
 import com.exam.eventhub.web.dto.BookingCreateRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -48,13 +49,17 @@ public class BookingController {
         Booking booking = bookingService.add(bookingCreateRequest, principal.getName());
         redirectAttributes.addFlashAttribute("booking", booking);
 
-        String redirectUrl = "redirect:/bookings/%s/confirmation".formatted(booking.getId());
-        return redirectUrl;
+        return "redirect:/bookings/%s/confirmation".formatted(booking.getId());
     }
 
     @GetMapping("/{id}/confirmation")
-    public String showBookingConfirmation(@PathVariable UUID id, Model model) {
+    public String showBookingConfirmation(@PathVariable UUID id, Model model, Principal principal) {
         Booking booking = bookingService.getById(id);
+
+        if (!booking.getUser().getUsername().equals(principal.getName())) {
+            throw new UnauthorizedException("You are not authorized to view this booking");
+        }
+
         model.addAttribute("booking", booking);
         return "booking-confirmation";
     }
