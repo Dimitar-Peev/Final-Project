@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <head th:replace="~{fragments/commons :: head('Discover Amazing Events')}"></head>
+    <head th:replace="~{fragments/commons :: head(#{page_title_home})}"></head>
 
     <body>
 
@@ -9,12 +9,12 @@
 
         <section class="hero">
             <div class="hero-content">
-                <h1>Discover Amazing Events</h1>
-                <p>Find and book tickets for concerts, conferences, workshops, and more. Create unforgettable memories with EventHub.</p>
+                <h1 th:text="#{home_hero_title}">Discover Amazing Events</h1>
+                <p th:text="#{home_hero_subtitle}">Find and book tickets for concerts, conferences, workshops, and more.</p>
                 <div class="hero-buttons">
-                    <a th:href="@{/events}" class="btn btn-primary">Explore Events</a>
-                    <a th:href="@{/events/create}" class="btn btn-outline" sec:authorize="hasAnyRole('EVENT_ORGANIZER', 'ADMIN')">Create Event</a>
-                    <a th:href="@{/register}" class="btn btn-outline" sec:authorize="isAnonymous()">Join Now</a>
+                    <a th:href="@{/events}" class="btn btn-primary" th:text="#{home_hero_explore}">Explore Events</a>
+                    <a th:href="@{/events/new}" class="btn btn-outline" sec:authorize="hasAnyRole('EVENT_ORGANIZER', 'ADMIN')" th:text="#{home_hero_create}">Create Event</a>
+                    <a th:href="@{/register}" class="btn btn-outline" sec:authorize="isAnonymous()" th:text="#{home_hero_join}">Join Now</a>
                 </div>
             </div>
         </section>
@@ -23,6 +23,3 @@
 
     </body>
 </html>
-
-
-
