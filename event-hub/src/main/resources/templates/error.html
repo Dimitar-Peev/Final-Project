@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Error')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="error-section">
+            <div class="container">
+                <div class="error-box">
+                    <div class="error-icon">⚠️</div>
+                    <h1 th:text="${status} ?: 500">500</h1>
+                    <h2 th:text="${error} ?: 'Unexpected Error'">Unexpected Error</h2>
+                    <p th:text="${errorMessage} ?: 'Something went wrong. Please try again later.'">
+                        Something went wrong. Please try again later.
+                    </p>
+
+                    <div class="error-actions">
+                        <a th:href="@{/}" class="btn btn-primary">Go Home</a>
+                        <a th:href="@{/contact}" class="btn btn-primary">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
