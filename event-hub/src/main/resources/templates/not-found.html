@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Object Not Found')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="error-section">
+            <div class="container">
+                <div class="error-box">
+                    <div class="error-icon">🔍</div>
+                    <h1>404</h1>
+                    <h2>Object Not Found</h2>
+                    <p th:text="${errorMessage} ?: 'The object you are looking for could not be found.'">
+                        The object you are looking for could not be found.
+                    </p>
+
+                    <div class="error-actions">
+                        <a th:href="@{/}" class="btn btn-primary">Go Home</a>
+                        <a th:href="@{/contact}" class="btn btn-primary">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
