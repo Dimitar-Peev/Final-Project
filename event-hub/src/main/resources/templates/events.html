@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <head th:replace="~{fragments/commons :: head('All Events')}"></head>
+    <head th:replace="~{fragments/commons :: head(#{page_title_events})}"></head>
 
     <body>
 
@@ -9,8 +9,8 @@
 
         <section class="page-header">
             <div class="container">
-                <h1>All Events</h1>
-                <p>Browse and discover events happening around you</p>
+                <h1 th:text="#{events_header_title}">All Events</h1>
+                <p th:text="#{events_header_subtitle}">Browse and discover events happening around you</p>
             </div>
         </section>
 
@@ -19,17 +19,17 @@
                 <div class="search-box">
                     <form class="search-form" th:action="@{/events/search}" th:method="get">
                         <div class="form-group">
-                            <label for="keyword">Event Name</label>
-                            <input type="text" id="keyword" name="keyword" th:value="${param.keyword}" placeholder="Search events...">
+                            <label for="keyword" th:text="#{events_search_keyword}">Event Name</label>
+                            <input type="text" id="keyword" name="keyword" th:value="${param.keyword}" th:placeholder="#{events_search_keyword_placeholder}">
                         </div>
                         <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city" name="city" th:value="${param.city}" placeholder="City...">
+                            <label for="city" th:text="#{events_search_city}">City</label>
+                            <input type="text" id="city" name="city" th:value="${param.city}" th:placeholder="#{events_search_city_placeholder}">
                         </div>
                         <div class="form-group">
-                            <label for="categoryId">Category</label>
+                            <label for="categoryId" th:text="#{events_search_category}">Category</label>
                             <select id="categoryId" name="categoryId">
-                                <option value="">All Categories</option>
+                                <option value="" th:text="#{events_search_allCategories}">All Categories</option>
                                 <option th:each="category : ${categories}"
                                         th:value="${category.id}"
                                         th:text="${category.name}"
@@ -38,7 +38,7 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="search-btn">Search</button>
+                        <button type="submit" class="search-btn" th:text="#{events_search_button}">Search</button>
                     </form>
                 </div>
             </div>
@@ -47,14 +47,15 @@
         <section class="events-section">
             <div class="container">
                 <div class="section-header">
-                    <h2>Events</h2>
-                    <p>Find events that match your interests</p>
+                    <h2 th:text="#{events_section_title}">Events</h2>
+                    <p th:text="#{events_section_subtitle}">Find events that match your interests</p>
                 </div>
 
                 <div class="events-grid" th:if="${events != null and !events.isEmpty()}">
                     <a th:each="event : ${events}"
                        th:href="@{/events/{id}(id=${event.id})}"
                        class="event-card">
+                        <!-- Event content stays the same; badge and price can be i18n too if needed -->
                         <div class="event-image">
                             <span th:switch="${event.category.name.toLowerCase()}">
                                 <span th:case="'music'">🎵</span>
@@ -94,12 +95,11 @@
                 </div>
 
                 <div class="no-events" th:if="${events == null or events.isEmpty()}">
-                    <h3>No events found</h3>
-                    <p style="margin-bottom: 1rem;">Try adjusting your search filters or check back later.</p>
-                    <a th:href="@{/events/create}" class="btn btn-primary"
-                       sec:authorize="hasAnyRole('EVENT_ORGANIZER','ADMIN')">
-                        Create Event
-                    </a>
+                    <h3 th:text="#{events_noEvents_title}">No events found</h3>
+                    <p th:text="#{events_noEvents_subtitle}">Try adjusting your search filters or check back later.</p>
+                    <a th:href="@{/events/new}" class="btn btn-primary"
+                       sec:authorize="hasAnyRole('EVENT_ORGANIZER','ADMIN')"
+                       th:text="#{events_noEvents_create}">Create Event</a>
                 </div>
             </div>
         </section>
