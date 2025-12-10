@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('My Notifications')}"></head>
+    <link rel="stylesheet" th:href="@{/css/notifications.css}" >
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header">
+            <div class="container">
+                <h1>My Notifications</h1>
+                <p>Manage and view your notifications</p>
+            </div>
+        </section>
+
+        <section class="admin-dashboard">
+            <div class="container dashboard-container admin-page">
+
+                <div th:if="${successMessage}" class="alert success" style="margin-bottom: 2rem;">
+                    <p th:text="${successMessage}"></p>
+                </div>
+
+                <div th:if="${infoMessage}" class="alert danger">
+                    <p th:text="${infoMessage}"></p>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-header">
+                        <h2><i class="fa-solid fa-bell"></i> Notifications</h2>
+
+                        <div class="notification-actions">
+                        <span class="status-label">
+                            Status:
+                            <strong th:if="${notificationsEnabled}" class="status active">Enabled</strong>
+                            <strong th:if="${!notificationsEnabled}" class="status blocked">Disabled</strong>
+                        </span>
+
+                            <form th:action="@{/notifications/settings}" th:method="patch" style="display:inline;">
+                                <button type="submit"
+                                        th:text="${notificationsEnabled} ? 'Disable Notifications' : 'Enable Notifications'"
+                                        th:classappend="${notificationsEnabled} ? 'btn danger' : 'btn success'"></button>
+                            </form>
+
+                            <form th:action="@{/notifications}" th:method="delete" style="display:inline;">
+                                <button type="submit" class="btn btn-outline danger">
+                                    <i class="fa-solid fa-trash-can"></i> Clear History
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <table class="dashboard-table"
+                           th:if="${notifications != null and !notifications.isEmpty()}">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="n : ${notifications}">
+                                <td th:text="${n.subject}">Subject</td>
+                                <td th:text="${n.message}">Message</td>
+                                <td>
+                                <span th:class="'status ' + ${n.status.toLowerCase()}"
+                                      th:text="${n.status}">SENT</span>
+                                </td>
+                                <td th:text="${#temporals.format(n.createdOn, 'dd MMM yyyy HH:mm')}">Date</td>
+                                <td class="action-buttons">
+                                    <form th:action="@{/notifications/{id}(id=${n.id})}" th:method="delete">
+                                        <button type="submit" class="btn btn-outline danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div th:if="${notifications == null or notifications.isEmpty()}" class="no-events">
+                        <h3>No notifications found</h3>
+                        <p>You have no notifications at the moment.</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
