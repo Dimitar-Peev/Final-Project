@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('Booking Confirmation')}"></head>
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header booking-header">
+            <div class="container">
+                <h1>Booking Confirmation</h1>
+                <p>Review your booking details and complete your payment</p>
+            </div>
+        </section>
+
+        <section class="booking-confirmation-section">
+            <div class="container booking-container">
+
+                <div class="booking-details">
+                    <h2>Your Booking</h2>
+                    <ul>
+                        <li><strong>Event:</strong> <span th:text="${booking.event.title}">Event Title</span></li>
+                        <li><strong>Date:</strong>
+                            <span th:text="${#temporals.format(booking.event.startDate, 'MMM dd, yyyy • HH:mm')}">Date</span>
+                        </li>
+                        <li><strong>Venue:</strong>
+                            <span th:text="${booking.event.venue.name + ', ' + booking.event.venue.city}">Venue</span>
+                        </li>
+                        <li><strong>Tickets:</strong>
+                            <span th:text="${booking.numberOfTickets}">2</span>
+                        </li>
+                        <li><strong>Total Price:</strong>
+                            <span th:if="${booking.totalAmount == 0}">Free</span>
+                            <span th:unless="${booking.totalAmount == 0}"
+                                  th:text="'$' + ${#numbers.formatDecimal(booking.totalAmount, 1, 2)}">Price</span>
+                        </li>
+                        <li><strong>Status:</strong> <span th:text="${booking.status}">Pending</span></li>
+                    </ul>
+                </div>
+
+                <div class="payment-section" th:if="${booking.totalAmount > 0}">
+                    <h2>Proceed to Payment</h2>
+
+                    <form th:action="@{/payments/bookings/{id}(id=${booking.id})}" th:method="post">
+                        <input type="hidden" name="amount" th:value="${booking.totalAmount}">
+                        <button type="submit" class="btn btn-primary">Pay Now</button>
+                    </form>
+
+                    <p class="note">Secure payment will be processed through our Payment Service.</p>
+                </div>
+
+                <div class="payment-section" th:if="${booking.totalAmount == 0}">
+                    <h2>No Payment Required</h2>
+                    <p>Your free tickets have been successfully reserved!</p>
+                </div>
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
