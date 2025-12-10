@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <head th:replace="~{fragments/commons :: head('User Registration')}"></head>
+    <head th:replace="~{fragments/commons :: head(#{register_title})}"></head>
 
     <body>
 
-        <header>
-            <div th:replace="~{fragments/commons :: nav}"></div>
-        </header>
+        <div th:replace="~{fragments/commons :: header}"></div>
 
         <section class="page-header register-header">
             <div class="container">
-                <h1>Create an Account</h1>
-                <p>Join EventHub and start booking amazing events</p>
+                <h1 th:text="#{register_title}">Create an Account</h1>
+                <p th:text="#{register_subtitle}">Join EventHub and start booking amazing events</p>
             </div>
         </section>
 
         <section class="register-section">
             <div class="container form-container">
+
                 <form class="register-form" th:action="@{/register}" th:object="${registerRequest}" th:method="post">
 
                     <div th:if="${errorMessage}" class="alert danger">
@@ -25,44 +24,59 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" th:field="*{username}" placeholder="Choose a username" >
-                        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message" style="font-size: 15px">Error message</small>
+                        <label for="username" th:text="#{register_username_label}">Username</label>
+                        <input type="text" id="username" th:field="*{username}"
+                               th:placeholder="#{register_username_placeholder}">
+                        <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                               class="error-message"></small>
                         <small class="error-message" th:text="${usernameAlreadyExistMessage}"></small>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" th:field="*{email}" placeholder="Enter your email" >
-                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message" style="font-size: 15px">Error message</small>
+                        <label for="email" th:text="#{register_email_label}">Email</label>
+                        <input type="email" id="email" th:field="*{email}"
+                               th:placeholder="#{register_email_placeholder}">
+                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+                               class="error-message"></small>
                         <small class="error-message" th:text="${emailAlreadyExistMessage}"></small>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" th:field="*{password}" placeholder="Create a password" >
-                        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message" style="font-size: 15px">Error message</small>
+                        <label for="password" th:text="#{register_password_label}">Password</label>
+                        <input type="password" id="password" th:field="*{password}"
+                               th:placeholder="#{register_password_placeholder}">
+                        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                               class="error-message"></small>
                     </div>
 
                     <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" placeholder="Confirm your password" >
-                        <small th:if="${#fields.hasErrors('passwordsMatching')}" th:errors="*{passwordsMatching}" class="error-message" style="font-size: 15px">Error message</small>
+                        <label for="confirmPassword" th:text="#{register_confirm_password_label}">Confirm Password</label>
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}"
+                               th:placeholder="#{register_confirm_password_placeholder}">
+                        <small th:if="${#fields.hasErrors('passwordsMatching')}" th:errors="*{passwordsMatching}"
+                               class="error-message"></small>
                     </div>
 
                     <div class="form-group" th:classappend="${#fields.hasErrors('role')} ? 'error'">
-                        <label for="role">Account Type</label>
+                        <label for="role" th:text="#{register_role_label}">Account Type</label>
                         <select id="role" th:field="*{role}">
-                            <option value="">Select account type...</option>
-                            <option value="USER">Event Attendee</option>
-                            <option value="EVENT_ORGANIZER">Event Organizer</option>
+                            <option value="" th:text="#{register_role_placeholder}">Select account type...</option>
+                            <option value="USER" th:text="#{register_role_user}">Event Attendee</option>
+                            <option value="EVENT_ORGANIZER" th:text="#{register_role_organizer}">Event Organizer</option>
                         </select>
-                        <span class="error-message" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Error message</span>
+                        <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}"
+                              class="error-message"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Register</button>
-                    <p class="form-note">Already have an account? <a th:href="@{/login}">Login here</a></p>
+                    <button type="submit" class="btn btn-primary" th:text="#{register_button}">Register</button>
+
+                    <p class="form-note">
+                        <span th:text="#{register_login_note}">Already have an account?</span>
+                        <a th:href="@{/login}" th:text="#{register_login_link}">Login here</a>
+                    </p>
+
                 </form>
+
             </div>
         </section>
 
