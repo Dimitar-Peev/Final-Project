@@ -1,0 +1,66 @@
+.status.confirmed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status.cancelled {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.status.pending {
+    color: #ca8a04;
+    font-weight: bold;
+}
+
+.status.refunded {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.action-buttons form {
+    display: inline-block;
+    margin: 0;
+}
+
+.action-buttons .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.btn.approve {
+    background: #10b981;
+    color: white;
+    border: none;
+}
+
+.btn.approve:hover {
+    background: #059669;
+}
+
+.btn.cancel {
+    background: #dc2626;
+    color: white;
+    border: none;
+}
+
+.btn.cancel:hover {
+    background: #b91c1c;
+}
+
+.btn.refund {
+    background: #f59e0b;
+    color: white;
+    border: none;
+}
+
+.btn.refund:hover {
+    background: #d97706;
+}
