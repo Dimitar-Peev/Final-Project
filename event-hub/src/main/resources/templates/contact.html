@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <head th:replace="~{fragments/commons :: head('Contact Us')}"></head>
+    <head th:replace="~{fragments/commons :: head(#{page_title_contact})}"></head>
 
     <body>
 
@@ -9,8 +9,8 @@
 
         <section class="page-header contact-header">
             <div class="container">
-                <h1>Contact Us</h1>
-                <p>We’d love to hear from you! Get in touch with our team.</p>
+                <h1 th:text="#{contact_header_title}">Contact Us</h1>
+                <p th:text="#{contact_header_subtitle}">We’d love to hear from you! Get in touch with our team.</p>
             </div>
         </section>
 
@@ -18,14 +18,14 @@
             <div class="container contact-container">
 
                 <div class="contact-info">
-                    <h2>Get in Touch</h2>
+                    <h2 th:text="#{contact_info_title}">Get in Touch</h2>
                     <p><i class="fa-solid fa-envelope"></i> support@eventhub.com</p>
                     <p><i class="fa-solid fa-phone"></i> +359 888 123 456</p>
                     <p><i class="fa-solid fa-location-dot"></i> Ruse, Bulgaria</p>
                 </div>
 
                 <div class="contact-form">
-                    <h2>Send Us a Message</h2>
+                    <h2 th:text="#{contact_form_title}">Send Us a Message</h2>
                     <form th:action="@{/contact}" th:method="post" th:object="${contactMessage}">
 
                         <div th:if="${successMessage}" class="alert success">
@@ -37,30 +37,30 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" th:field="*{name}" placeholder="Enter your name">
+                            <label for="name" th:text="#{contact_form_name}">Your Name</label>
+                            <input type="text" id="name" th:field="*{name}" th:placeholder="#{contact_form_name_placeholder}">
                             <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></small>
                         </div>
 
                         <div class="form-group">
-                            <label for="email">Your Email</label>
-                            <input type="email" id="email" th:field="*{email}" placeholder="Enter your email">
+                            <label for="email" th:text="#{contact_form_email}">Your Email</label>
+                            <input type="email" id="email" th:field="*{email}" th:placeholder="#{contact_form_email_placeholder}">
                             <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></small>
                         </div>
 
                         <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" th:field="*{subject}" placeholder="Message subject">
+                            <label for="subject" th:text="#{contact_form_subject}">Subject</label>
+                            <input type="text" id="subject" th:field="*{subject}" th:placeholder="#{contact_form_subject_placeholder}">
                             <small th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}" class="error-message"></small>
                         </div>
 
                         <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" th:field="*{message}" rows="5" placeholder="Write your message"></textarea>
+                            <label for="message" th:text="#{contact_form_message}">Message</label>
+                            <textarea id="message" th:field="*{message}" rows="5" th:placeholder="#{contact_form_message_placeholder}"></textarea>
                             <small th:if="${#fields.hasErrors('message')}" th:errors="*{message}" class="error-message"></small>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Send Message</button>
+                        <button type="submit" class="btn btn-primary" th:text="#{contact_form_submit}">Send Message</button>
                     </form>
                 </div>
 
