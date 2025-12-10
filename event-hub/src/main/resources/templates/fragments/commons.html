@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head th:fragment="head(title)">
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title th:text="${'EventHub - ' + title}">EventHub - Discover Amazing Events</title>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="/css/style.css"/>
+        <link rel="stylesheet" href="/css/commons.css"/>
+    </head>
+
+    <body>
+        <header th:fragment="header">
+            <nav>
+                <div class="nav-container">
+
+                    <a th:href="@{/}" class="logo">
+                        <div class="logo-icon">🎪</div>
+                        EventHub
+                    </a>
+
+                    <div class="nav-links">
+                        <a th:text="#{nav_bar_browse_events}" th:href="@{/events}">Browse Events</a>
+
+                        <th:block sec:authorize="isAuthenticated()">
+                            <a th:text="#{nav_bar_categories}" th:href="@{/categories}">Categories</a>
+                            <a th:text="#{nav_bar_venues}" th:href="@{/venues}">Venues</a>
+                        </th:block>
+
+                        <a th:text="#{nav_bar_about}" th:href="@{/about}">About</a>
+                        <a th:text="#{nav_bar_contact}" th:href="@{/contact}">Contacts</a>
+                    </div>
+
+                    <div class="auth-buttons">
+
+                        <span sec:authorize="isAnonymous()">
+                            <a th:text="#{nav_bar_login}" th:href="@{/login}" class="btn btn-outline">Login</a>
+                            <a th:text="#{nav_bar_signup}" th:href="@{/register}" class="btn btn-primary">Sign Up</a>
+                        </span>
+
+                        <span sec:authorize="isAuthenticated()">
+                            <div class="user-menu">
+                                <button class="user-menu-button" onclick="toggleUserMenu(event)">
+                                    <img th:src="${!#strings.isEmpty(#authentication.principal.profileImageUrl)
+                                        ? #authentication.principal.profileImageUrl
+                                        : 'https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/avatar-default-icon.png'}"
+                                         alt="Profile" class="user-avatar"
+                                         onerror="this.src='/images/default-avatar.png'">
+
+                                    <span>
+                                        <span th:text="#{nav_bar_welcome}">Welcome,</span>
+                                        <b><span sec:authentication="name"></span></b>!
+                                    </span>
+
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+
+                                <div class="user-menu-dropdown">
+
+                                    <a th:href="@{/profile}">
+                                        <i class="fas fa-user"></i> <span th:text="#{nav_bar_profile}">Profile</span>
+                                    </a>
+
+                                    <a th:href="@{/bookings/my}">
+                                        <i class="fas fa-ticket-alt"></i> <span
+                                            th:text="#{nav_bar_bookings}">Bookings</span>
+                                    </a>
+
+                                    <a th:href="@{/notifications}">
+                                        <i class="fas fa-bell"></i> <span
+                                            th:text="#{nav_bar_notifications}">Notifications</span>
+                                    </a>
+
+                                    <a th:href="@{/profile/payments}">
+                                        <i class="fas fa-credit-card"></i> <span th:text="#{nav_bar_payment_history}">Payment History</span>
+                                    </a>
+
+                                    <th:block sec:authorize="hasRole('EVENT_ORGANIZER')">
+                                        <a th:href="@{/events/my}">
+                                            <i class="fas fa-calendar-check"></i>
+                                            <span th:text="#{nav_bar_manage_events}">Manage Events</span>
+                                        </a>
+                                    </th:block>
+
+                                    <th:block sec:authorize="hasRole('ADMIN')">
+                                        <a th:href="@{/admin}">
+                                            <i class="fas fa-cog"></i>
+                                            <span th:text="#{nav_bar_admin_dashboard}">Admin Dashboard</span>
+                                        </a>
+                                    </th:block>
+
+                                    <form th:action="@{/logout}" th:method="post" style="margin: 0;">
+                                        <button type="submit" style="width: 100%; text-align: left; padding: 0.75rem 1rem;
+                                                background: none; border: none; color: #333; cursor: pointer;
+                                                transition: background 0.3s; border-radius: 0 0 8px 8px;
+                                                font-size: inherit; font-family: inherit;">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            <span th:text="#{nav_bar_logout}">Logout</span>
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </span>
+
+                        <div class="language-switcher">
+                            <form th:method="get" class="lang-form">
+                                <button type="button" class="lang-button" onclick="toggleLangMenu(event)">
+                                    🌐 <span th:text="${#locale.toString() == 'bg_BG' ? 'BG' : 'EN'}">EN</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+
+                                <div class="lang-dropdown">
+                                    <button type="submit" name="lang" value="en_US"
+                                            class="lang-option"
+                                            th:classappend="${#locale.toString() == 'en_US'} ? ' active'">
+                                        🇺🇸 English
+                                    </button>
+
+                                    <button type="submit" name="lang" value="bg_BG"
+                                            class="lang-option"
+                                            th:classappend="${#locale.toString() == 'bg_BG'} ? ' active'">
+                                        🇧🇬 Български
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </nav>
+
+            <script>
+                function toggleUserMenu(event) {
+                    event.stopPropagation();
+                    const menu = event.currentTarget.closest('.user-menu');
+                    menu.classList.toggle('active');
+                }
+
+                document.addEventListener('click', function (event) {
+                    const menus = document.querySelectorAll('.user-menu');
+                    menus.forEach(menu => {
+                        if (!menu.contains(event.target)) {
+                            menu.classList.remove('active');
+                        }
+                    });
+                });
+
+                function toggleLangMenu(event) {
+                    event.stopPropagation();
+                    const menu = event.currentTarget.closest('.language-switcher');
+                    menu.classList.toggle('active');
+                }
+
+                document.addEventListener('click', function (event) {
+                    const menus = document.querySelectorAll('.language-switcher');
+                    menus.forEach(menu => {
+                        if (!menu.contains(event.target)) {
+                            menu.classList.remove('active');
+                        }
+                    });
+                });
+            </script>
+        </header>
+
+        <footer th:fragment="footer">
+            <div class="footer-content">
+                <h3>EventHub</h3>
+
+                <p th:text="#{footer_tagline}">
+                    Your ultimate destination for discovering and booking amazing events.
+                </p>
+
+                <div class="social-links">
+                    <a href="#" title="Facebook" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter" class="twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram" class="instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn" class="linkedin"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>
+                        &copy; 2025 EventHub.
+                        <span th:text="#{footer_rights}">All rights reserved.</span>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+    </body>
+</html>
