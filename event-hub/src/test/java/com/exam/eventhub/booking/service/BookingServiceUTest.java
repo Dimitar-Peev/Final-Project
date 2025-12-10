@@ -5,9 +5,7 @@ import com.exam.eventhub.booking.model.BookingStatus;
 import com.exam.eventhub.booking.repository.BookingRepository;
 import com.exam.eventhub.event.model.Event;
 import com.exam.eventhub.event.service.EventService;
-import com.exam.eventhub.exception.BookingNotFoundException;
-import com.exam.eventhub.exception.PaymentProcessingException;
-import com.exam.eventhub.exception.PaymentServiceUnavailableException;
+import com.exam.eventhub.exception.*;
 import com.exam.eventhub.notification.service.NotificationService;
 import com.exam.eventhub.payment.client.dto.PaymentResponse;
 import com.exam.eventhub.payment.service.PaymentService;
@@ -511,12 +509,13 @@ public class BookingServiceUTest {
     }
 
     @Test
-    void markAsPaid_whenAlreadyPaid_shouldReturnWithoutProcessing() {
+    void markAsPaid_whenAlreadyPaid_shouldThrowException() {
 
         UUID bookingId = UUID.randomUUID();
         UUID existingPaymentId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(UUID.randomUUID(), "user");
+        User user = createUser(UUID.randomUUID(), username);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
         Booking booking = createBooking(bookingId, user, event, 2, new BigDecimal("100.00"));
@@ -525,18 +524,22 @@ public class BookingServiceUTest {
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
-        bookingService.markAsPaid(bookingId);
+        BookingAlreadyConfirmedException exception =
+                assertThrows(BookingAlreadyConfirmedException.class, () -> bookingService.markAsPaid(bookingId, username));
+
+        assertTrue(exception.getMessage().contains("already has a payment"));
 
         verify(paymentService, never()).processPayment(any(), any(), any());
         verify(bookingRepository, times(1)).findById(bookingId);
     }
 
     @Test
-    void markAsPaid_whenBookingAlreadyConfirmed_shouldReturnWithoutProcessing() {
+    void markAsPaid_whenBookingAlreadyConfirmed_shouldThrowException() {
 
         UUID bookingId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(UUID.randomUUID(), "user");
+        User user = createUser(UUID.randomUUID(), username);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
         Booking booking = createBooking(bookingId, user, event, 2, new BigDecimal("100.00"));
@@ -545,7 +548,11 @@ public class BookingServiceUTest {
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
-        bookingService.markAsPaid(bookingId);
+        BookingAlreadyConfirmedException exception =
+                assertThrows(BookingAlreadyConfirmedException.class,
+                        () -> bookingService.markAsPaid(bookingId, username));
+
+        assertTrue(exception.getMessage().contains("already confirmed"));
 
         verify(paymentService, never()).processPayment(any(), any(), any());
         verify(bookingRepository, times(1)).findById(bookingId);
@@ -557,8 +564,9 @@ public class BookingServiceUTest {
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(true);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
@@ -571,7 +579,7 @@ public class BookingServiceUTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(paymentService.processPayment(bookingId, userId, booking.getTotalAmount())).thenReturn(paymentResponse);
 
-        bookingService.markAsPaid(bookingId);
+        bookingService.markAsPaid(bookingId, username);
 
         verify(paymentService).processPayment(bookingId, userId, booking.getTotalAmount());
         verify(bookingRepository, times(2)).findById(bookingId);
@@ -583,8 +591,9 @@ public class BookingServiceUTest {
 
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(true);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
@@ -595,8 +604,9 @@ public class BookingServiceUTest {
         when(paymentService.processPayment(bookingId, userId, booking.getTotalAmount()))
                 .thenThrow(new PaymentProcessingException("Payment declined"));
 
-        IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> bookingService.markAsPaid(bookingId));
+        PaymentProcessingException exception =
+                assertThrows(PaymentProcessingException.class,
+                        () -> bookingService.markAsPaid(bookingId, username));
         assertTrue(exception.getMessage().contains("Payment processing failed"));
 
         verify(notificationService).sendIfEnabled(eq(user), eq("Payment Failed"), anyString());
@@ -608,8 +618,9 @@ public class BookingServiceUTest {
 
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
         Booking booking = createBooking(bookingId, user, event, 2, new BigDecimal("100.00"));
@@ -619,8 +630,8 @@ public class BookingServiceUTest {
         when(paymentService.processPayment(bookingId, userId, booking.getTotalAmount()))
                 .thenThrow(new PaymentServiceUnavailableException("Service down"));
 
-        IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> bookingService.markAsPaid(bookingId));
+        PaymentProcessingException exception =
+                assertThrows(PaymentProcessingException.class, () -> bookingService.markAsPaid(bookingId, username));
         assertTrue(exception.getMessage().contains("Payment service is temporarily unavailable"));
     }
 
@@ -630,8 +641,9 @@ public class BookingServiceUTest {
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(false);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
@@ -644,7 +656,7 @@ public class BookingServiceUTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(paymentService.processPayment(bookingId, userId, booking.getTotalAmount())).thenReturn(paymentResponse);
 
-        bookingService.markAsPaid(bookingId);
+        bookingService.markAsPaid(bookingId, username);
 
         verify(paymentService).processPayment(bookingId, userId, booking.getTotalAmount());
         verify(notificationService, never()).sendIfEnabled(any(), any(), any());
@@ -656,8 +668,9 @@ public class BookingServiceUTest {
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(true);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
@@ -673,7 +686,7 @@ public class BookingServiceUTest {
         doThrow(new RuntimeException("Notification failed"))
                 .when(notificationService).sendIfEnabled(any(), eq("Payment Successful"), anyString());
 
-        bookingService.markAsPaid(bookingId);
+        bookingService.markAsPaid(bookingId, username);
 
         verify(paymentService).processPayment(bookingId, userId, booking.getTotalAmount());
         verify(notificationService).sendIfEnabled(eq(user), eq("Payment Successful"), anyString());
@@ -685,8 +698,9 @@ public class BookingServiceUTest {
 
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(true);
         Event event = createEvent(UUID.randomUUID(), "Marathon", new BigDecimal("15.00"), 500, 500);
 
@@ -700,8 +714,9 @@ public class BookingServiceUTest {
         doThrow(new RuntimeException("SMS gateway error"))
                 .when(notificationService).sendIfEnabled(eq(user), eq("Payment Failed"), anyString());
 
-        IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> bookingService.markAsPaid(bookingId));
+        PaymentProcessingException exception =
+                assertThrows(PaymentProcessingException.class,
+                        () -> bookingService.markAsPaid(bookingId, username));
         assertTrue(exception.getMessage().contains("Payment processing failed"));
 
         verify(notificationService).sendIfEnabled(eq(user), eq("Payment Failed"), anyString());
@@ -713,8 +728,9 @@ public class BookingServiceUTest {
 
         UUID bookingId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        String username = "user";
 
-        User user = createUser(userId, "user");
+        User user = createUser(userId, username);
         user.setNotificationsEnabled(false);
         Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
 
@@ -725,11 +741,34 @@ public class BookingServiceUTest {
         when(paymentService.processPayment(bookingId, userId, booking.getTotalAmount()))
                 .thenThrow(new PaymentProcessingException("Payment declined"));
 
-        IllegalStateException exception =
-                assertThrows(IllegalStateException.class, () -> bookingService.markAsPaid(bookingId));
+        PaymentProcessingException exception =
+                assertThrows(PaymentProcessingException.class, () -> bookingService.markAsPaid(bookingId, username));
         assertTrue(exception.getMessage().contains("Payment processing failed"));
 
         verify(notificationService, never()).sendIfEnabled(any(), any(), any());
+        verify(bookingRepository, times(1)).findById(bookingId);
+    }
+
+    @Test
+    void markAsPaid_whenUnauthorizedUser_shouldThrowException() {
+
+        UUID bookingId = UUID.randomUUID();
+        String username = "user";
+        String otherUsername = "otherUser";
+
+        User user = createUser(UUID.randomUUID(), username);
+        Event event = createEvent(UUID.randomUUID(), "Event", new BigDecimal("50.00"), 100, 100);
+
+        Booking booking = createBooking(bookingId, user, event, 2, new BigDecimal("100.00"));
+        booking.setStatus(BookingStatus.PENDING);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+        UnauthorizedException exception =
+                assertThrows(UnauthorizedException.class, () -> bookingService.markAsPaid(bookingId, otherUsername));
+        assertTrue(exception.getMessage().contains("not authorized"));
+
+        verify(paymentService, never()).processPayment(any(), any(), any());
         verify(bookingRepository, times(1)).findById(bookingId);
     }
 
