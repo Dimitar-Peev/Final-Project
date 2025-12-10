@@ -5,9 +5,7 @@ import com.exam.eventhub.booking.model.BookingStatus;
 import com.exam.eventhub.booking.repository.BookingRepository;
 import com.exam.eventhub.event.model.Event;
 import com.exam.eventhub.event.service.EventService;
-import com.exam.eventhub.exception.BookingNotFoundException;
-import com.exam.eventhub.exception.PaymentProcessingException;
-import com.exam.eventhub.exception.PaymentServiceUnavailableException;
+import com.exam.eventhub.exception.*;
 import com.exam.eventhub.notification.service.NotificationService;
 import com.exam.eventhub.payment.client.dto.PaymentResponse;
 import com.exam.eventhub.payment.service.PaymentService;
@@ -177,17 +175,21 @@ public class BookingService {
         return this.bookingRepository.countByEventId(id);
     }
 
-    public void markAsPaid(UUID bookingId) {
+    public void markAsPaid(UUID bookingId, String username) {
         Booking booking = getById(bookingId);
+
+        if (!booking.getUser().getUsername().equals(username)) {
+            throw new UnauthorizedException("You are not authorized to pay for this booking");
+        }
 
         if (booking.getPaymentId() != null) {
             log.warn("Booking {} already has payment ID {}", bookingId, booking.getPaymentId());
-            return;
+            throw new BookingAlreadyConfirmedException("This booking already has a payment");
         }
 
         if (booking.getStatus() == BookingStatus.CONFIRMED) {
             log.info("Booking {} is already confirmed", bookingId);
-            return;
+            throw new BookingAlreadyConfirmedException("This booking is already confirmed");
         }
 
         User user = booking.getUser();
@@ -199,20 +201,18 @@ public class BookingService {
             paymentResponse = paymentService.processPayment(bookingId, user.getId(), amount);
         } catch (PaymentProcessingException e) {
             log.error("Payment processing failed for booking {}: {}", bookingId, e.getMessage());
-
             sendPaymentFailedNotification(user, event);
+            throw new PaymentProcessingException("Payment processing failed. Please try again.");
 
-            throw new IllegalStateException("Payment processing failed. Please try again.");
         } catch (PaymentServiceUnavailableException e) {
             log.error("Payment service unavailable for booking {}: {}", bookingId, e.getMessage());
-            throw new IllegalStateException("Payment service is temporarily unavailable. Please try again later.");
+            throw new PaymentProcessingException("Payment service is temporarily unavailable. Please try again later.");
         }
 
         confirmBookingAfterPayment(bookingId, paymentResponse.getPaymentId());
-
         sendPaymentSuccessNotification(user, event);
 
-        log.info("Payment confirmed for booking {}", bookingId);
+        log.info("Payment confirmed for booking {} by user {}", bookingId, username);
     }
 
     public boolean hasUserBookedEvent(String username, UUID eventId) {
