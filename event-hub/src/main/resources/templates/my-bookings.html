@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{fragments/commons :: head('My Bookings')}"></head>
+    <link rel="stylesheet" th:href="@{/css/my-bookings.css}" >
+
+    <body>
+
+        <div th:replace="~{fragments/commons :: header}"></div>
+
+        <section class="page-header bookings-header">
+            <div class="container">
+                <h1>My Bookings</h1>
+                <p>Here are all your event reservations</p>
+            </div>
+        </section>
+
+        <section class="bookings-section">
+            <div class="container">
+
+                <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${successMessage}"></span>
+                </div>
+
+                <div th:if="${infoMessage}" class="alert alert-success" role="alert">
+                    <span th:text="${infoMessage}"></span>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <div class="bookings-grid" th:if="${bookings != null and !bookings.isEmpty()}">
+                    <div class="booking-card" th:each="booking : ${bookings}">
+
+                        <div class="booking-header">
+                            <h3 th:text="${booking.event.title}">Event Title</h3>
+
+                            <span th:text="${booking.status}"
+                                  class="booking-status"
+                                  th:classappend="${'booking-status-' + #strings.toLowerCase(booking.status)}">
+                            </span>
+                        </div>
+
+                        <div class="booking-info">
+                            <p><i class="fa-solid fa-calendar-days"></i>
+                                <span th:text="${#temporals.format(booking.event.startDate, 'MMM dd, yyyy • HH:mm')}">
+                                Date
+                            </span>
+                            </p>
+                            <p><i class="fa-solid fa-location-dot"></i>
+                                <span th:text="${booking.event.venue.name + ', ' + booking.event.venue.city}">
+                                Venue
+                            </span>
+                            </p>
+                            <p><i class="fa-solid fa-ticket"></i>
+                                <span th:text="${booking.numberOfTickets} + ' tickets'">2 tickets</span>
+                            </p>
+
+                            <p><i class="fas fa-money-bill-wave"></i>
+                                <span th:if="${booking.totalAmount == 0}">Free</span>
+                                <span th:unless="${booking.totalAmount == 0}"
+                                      th:text="${#numbers.formatDecimal(booking.totalAmount, 1, 2) + ' BGN / '
+                                      + #numbers.formatDecimal(booking.totalAmount / 1.95583, 1, 2) + ' EUR'}">
+                                    50.00 BGN / 25.56 EUR
+                                </span>
+                            </p>
+
+                            <hr />
+                            <p><i class="fa-solid fa-envelope"></i>
+                                <strong>Email:</strong> <span th:text="${booking.customerEmail}">john@example.com</span>
+                            </p>
+                            <p th:if="${booking.customerPhone}">
+                                <i class="fa-solid fa-phone"></i>
+                                <strong>Phone:</strong> <span th:text="${booking.customerPhone}">+359 88 123 4567</span>
+                            </p>
+                            <p th:if="${booking.specialRequests}">
+                                <i class="fa-solid fa-note-sticky"></i>
+                                <strong>Notes:</strong> <span th:text="${booking.specialRequests}">Vegetarian meal</span>
+                            </p>
+                        </div>
+
+                        <div class="booking-actions">
+
+                            <a th:href="@{/events/{id}(id=${booking.event.id})}" class="btn btn-primary">View Event</a>
+
+                            <form th:if="${booking.status.name() == 'PENDING'}"
+                                  th:action="@{/payments/pay/{id}(id=${booking.id})}" th:method="post"
+                                  style="display:inline;">
+                                <input type="hidden" name="amount" th:value="${booking.totalAmount}">
+                                <button type="submit" class="btn btn-success">Pay Now</button>
+                            </form>
+
+                            <form th:action="@{/bookings/{id}(id=${booking.id})}" th:method="delete">
+                                <button type="submit" class="btn btn-primary danger">Cancel Booking</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-events" th:if="${bookings == null or bookings.isEmpty()}">
+                    <h3>You have no bookings yet</h3>
+                    <p>Find events you like and reserve your spot!</p>
+                    <a th:href="@{/events}" class="btn btn-primary" style="margin-top: 1rem">Browse Events</a>
+                </div>
+
+            </div>
+        </section>
+
+        <div th:replace="~{fragments/commons :: footer}"></div>
+
+    </body>
+</html>
