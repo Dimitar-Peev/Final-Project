@@ -1,64 +1,71 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <head th:replace="~{fragments/commons :: head('User Login')}"></head>
+    <head th:replace="~{fragments/commons :: head(#{login_title})}"></head>
 
     <body>
 
-        <header>
-            <div th:replace="~{fragments/commons :: nav}"></div>
-        </header>
+        <div th:replace="~{fragments/commons :: header}"></div>
 
         <section class="page-header login-header">
             <div class="container">
-                <h1>Login</h1>
-                <p>Access your EventHub account</p>
+                <h1 th:text="#{login_title}">Login</h1>
+                <p th:text="#{login_subtitle}">Access your EventHub account</p>
             </div>
         </section>
 
         <section class="login-section">
             <div class="container form-container">
+
                 <form th:action="@{/login}" th:object="${loginRequest}" th:method="post" class="login-form">
 
-                    <p class="success-message" th:if="${param.registered}">
-                        Registration successful ! <br> Please sign in with your new account.
+                    <p class="success-message" th:if="${param.registered}" th:text="#{login_registration_success}">
+                        Registration successful!
                     </p>
 
                     <div class="form-group">
-                        <label for="username">Username or Email</label>
-                        <input type="text" id="username" name="username"  th:field="*{username}" placeholder="Enter username or email">
-                        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message">Error messages</div>
+                        <label for="username" th:text="#{login_username_label}">Username or Email</label>
+                        <input type="text" id="username" name="username" th:field="*{username}"
+                               th:placeholder="#{login_username_placeholder}">
+                        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
+                             class="error-message"></div>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" th:field="*{password}" placeholder="Enter your password">
-                        <div  th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message">Error messages</div>
+                        <label for="password" th:text="#{login_password_label}">Password</label>
+                        <input type="password" id="password" name="password" th:field="*{password}"
+                               th:placeholder="#{login_password_placeholder}">
+                        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                             class="error-message"></div>
                     </div>
 
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="remember-me"/> Remember Me
+                            <input type="checkbox" name="remember-me"/>
+                            <span th:text="#{login_remember_me}">Remember Me</span>
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary" th:text="#{login_button}">Login</button>
 
                     <div th:if="${param.error}" class="error-message">
-                        <span th:if="${param.error[0] == 'blocked'}">Your account has been blocked. Contact support.</span>
-                        <span th:unless="${param.error[0] == 'blocked'}">Invalid username or password. Please try again.</span>
+                        <span th:if="${param.error[0] == 'blocked'}" th:text="#{login_error_blocked}">Your account has been blocked</span>
+                        <span th:unless="${param.error[0] == 'blocked'}" th:text="#{login_error_invalid}">Invalid login</span>
                     </div>
 
-
-                    <p class="success-message" th:if="${param.logout}">
-                        You have been successfully logged out.
+                    <p class="success-message" th:if="${param.logout}" th:text="#{login_success_logout}">
+                        You have been logged out.
                     </p>
 
                     <div th:if="${param.rememberExpired}" class="error-message">
-                        <span class="alert alert-warning">Your session expired. Please log in again.</span>
+                        <span class="alert alert-warning" th:text="#{login_session_expired}">Session expired</span>
                     </div>
 
-                    <p class="form-note">Don't have an account? <a th:href="@{/register}">Register here</a></p>
+                    <p class="form-note">
+                        <span th:text="#{login_register_note}">Don't have an account?</span>
+                        <a th:href="@{/register}" th:text="#{login_register_link}">Register here</a>
+                    </p>
+
                 </form>
             </div>
         </section>
