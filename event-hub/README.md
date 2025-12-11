@@ -231,7 +231,7 @@ http://localhost:8080/v3/api-docs
 
 ## 🔐 Security
 
-* JWT базирана Authentication & Authorization
+* Authentication & Authorization
 * Роли: USER, ADMIN
 * Open, Authenticated и Authorized endpoints
 * CSRF защита активирана
