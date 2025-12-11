@@ -396,7 +396,7 @@ public void cleanupOldNotifications()
 
 ## 👥 Автор
 
-Exam Project - Spring Advanced October 2025 Retake Exam
+Dimitar Peev - Spring Advanced October 2025 Retake Exam
 
 ## 📄 Лиценз
 
