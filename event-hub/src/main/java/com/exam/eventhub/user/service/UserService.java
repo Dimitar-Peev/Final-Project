@@ -27,10 +27,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.exam.eventhub.common.Constants.*;
+
 @Slf4j
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
+    private static final String ENTITY_NAME = "User";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +46,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    void initializeUsers() {
+    private void initializeUsers() {
         log.info("Initializing users...");
         List<User> defaultUsers = new ArrayList<>();
 
@@ -82,12 +86,12 @@ public class UserService implements UserDetailsService {
 
         Optional<User> byUsername = userRepository.findByUsername(registerRequest.getUsername());
         if (byUsername.isPresent()) {
-            throw new UsernameAlreadyExistsException("The username '" + name + "' already exists.");
+            throw new UsernameAlreadyExistsException(USERNAME_EXIST.formatted(name));
         }
 
         Optional<User> byEmail = userRepository.findByEmail(registerRequest.getEmail());
         if (byEmail.isPresent()) {
-            throw new EmailAlreadyExistsException("There is an existing account associated with this email");
+            throw new EmailAlreadyExistsException(EMAIL_EXIST);
         }
 
         User user = create(registerRequest);
@@ -117,7 +121,7 @@ public class UserService implements UserDetailsService {
         Optional<User> userByEmail = userRepository.findByEmail(updatedData.getEmail());
 
         if (emailChanged && userByEmail.isPresent()) {
-            throw new EmailDuplicateException("There is an existing account associated with this email");
+            throw new EmailDuplicateException(EMAIL_EXIST);
         }
 
         user.setEmail(updatedData.getEmail());
@@ -134,6 +138,9 @@ public class UserService implements UserDetailsService {
         User user = getById(id);
         user.setBlocked(true);
         this.userRepository.save(user);
+
+        jdbcTemplate.update("DELETE FROM persistent_logins WHERE username = ?", user.getUsername());
+        log.info("Deleted remember-me tokens for blocked user {}", user.getUsername());
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -145,7 +152,7 @@ public class UserService implements UserDetailsService {
 
     public User getById(UUID id) {
         return this.userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with ID [%s] was not found.".formatted(id)));
+                .orElseThrow(() -> new UserNotFoundException(ID_NOT_FOUND.formatted(ENTITY_NAME, id)));
     }
 
     public User getByUsername(String name) {
@@ -179,17 +186,18 @@ public class UserService implements UserDetailsService {
         this.userRepository.save(user);
     }
 
+    @CacheEvict(value = "users", allEntries = true)
+    public boolean toggleNotifications(User user) {
+        user.setNotificationsEnabled(!user.isNotificationsEnabled());
+        this.userRepository.save(user);
+        return user.isNotificationsEnabled();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
 
         User user = getByUsernameOrEmail(usernameOrEmail);
 
         return new AuthenticationMetadata(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.isBlocked(), user.getProfileImageUrl());
-    }
-
-    @CacheEvict(value = "users", allEntries = true)
-    public void toggleNotifications(User user) {
-        user.setNotificationsEnabled(!user.isNotificationsEnabled());
-        this.userRepository.save(user);
     }
 }
