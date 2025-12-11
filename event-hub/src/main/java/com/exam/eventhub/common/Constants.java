@@ -23,4 +23,6 @@ public class Constants {
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred. Please try again.";
     public static final String DELETE_UNSUCCESSFUL = "Error deleting notification. Please try again later!";
 
+    public static final String NOT_AUTHORIZED = "You are not authorized to delete this notification";
+
 }
