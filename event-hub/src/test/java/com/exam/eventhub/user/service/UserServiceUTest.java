@@ -14,13 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,10 +37,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUTest {
 
+    @Captor
+    private ArgumentCaptor<List<User>> listUserCaptor;
+
     @Mock
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
     private UserService userService;
@@ -51,22 +59,18 @@ public class UserServiceUTest {
         defaultUser.setId(UUID.randomUUID());
     }
 
-    // ---------- initData() ----------
     @Test
     void givenRepository_whenRepositoryIsEmpty_thenInitializeUsers() {
-        // Given
+
         when(userRepository.count()).thenReturn(0L);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // When
         userService.initData();
 
-        // Then
-        ArgumentCaptor<List<User>> captor = ArgumentCaptor.forClass(List.class);
-        verify(userRepository).saveAll(captor.capture());
+        verify(userRepository).saveAll(listUserCaptor.capture());
 
-        List<User> savedUsers = captor.getValue();
+        List<User> savedUsers = listUserCaptor.getValue();
         assertEquals(3, savedUsers.size());
 
         User admin = savedUsers.get(0);
@@ -93,40 +97,31 @@ public class UserServiceUTest {
     @Test
     void givenRepository_whenRepositoryIsNotEmpty_thenNotInitializeUsers() {
 
-        // Given
         when(userRepository.count()).thenReturn(5L);
 
-        // When
         userService.initData();
 
-        // Then
         verify(userRepository).count();
         verify(userRepository, never()).saveAll(anyList());
         verify(passwordEncoder, never()).encode(anyString());
     }
 
-    // ---------- getAll() ----------
     @Test
     void givenExistingUsersInDatabase_whenGetAllUsers_thenReturnThemAll() {
 
-        // Given
         List<User> userList = List.of(defaultUser, new User());
         when(userRepository.findAll()).thenReturn(userList);
 
-        // When
         List<User> result = userService.getAll();
 
-        // Then
         assertEquals(2, result.size());
         assertEquals(defaultUser, result.get(0));
         verify(userRepository, times(1)).findAll();
     }
 
-    // ---------- register() ----------
     @Test
     void givenNonExistingUsername_whenRegister_thenSaveToDatabase() {
 
-        // Given
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setUsername("newUser");
         registerRequest.setEmail("new@exam.com");
@@ -147,10 +142,8 @@ public class UserServiceUTest {
         when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encodedPass");
         when(userRepository.save(any())).thenReturn(user);
 
-        // When
         User saved = userService.register(registerRequest);
 
-        // Then
         assertNotNull(saved);
         assertEquals("newUser", saved.getUsername());
         assertEquals("new@exam.com", saved.getEmail());
@@ -165,7 +158,6 @@ public class UserServiceUTest {
     @Test
     void givenNewUser_whenUsernameAndEmailNotExist_thenSaveToDatabase() {
 
-        // Given
         RegisterRequest request = new RegisterRequest();
         request.setUsername("newUser");
         request.setEmail("new@exam.com");
@@ -177,10 +169,8 @@ public class UserServiceUTest {
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPass");
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
-        // When
         User saved = userService.register(request);
 
-        // Then
         assertNotNull(saved);
         assertEquals(request.getUsername(), saved.getUsername());
         assertEquals(Role.USER, saved.getRole());
@@ -189,7 +179,7 @@ public class UserServiceUTest {
 
     @Test
     void givenNewUser_whenUsernameExists_thenThrowUsernameAlreadyExistsException() {
-        // Given
+
         RegisterRequest validRegisterRequest = new RegisterRequest();
         validRegisterRequest.setUsername("newUser");
         validRegisterRequest.setEmail("test@example.com");
@@ -202,7 +192,6 @@ public class UserServiceUTest {
 
         when(userRepository.findByUsername(validRegisterRequest.getUsername())).thenReturn(Optional.of(existingUser));
 
-        // When & Then
         UsernameAlreadyExistsException exception =
                 assertThrows(UsernameAlreadyExistsException.class, () -> userService.register(validRegisterRequest));
         assertTrue(exception.getMessage().contains(USERNAME_EXIST.formatted(validRegisterRequest.getUsername())));
@@ -215,7 +204,7 @@ public class UserServiceUTest {
 
     @Test
     void givenNewUser_whenEmailExists_thenThrowEmailAlreadyExistsException() {
-        // Given
+
         RegisterRequest validRegisterRequest = new RegisterRequest();
         validRegisterRequest.setUsername("newUser");
         validRegisterRequest.setEmail("test@example.com");
@@ -229,7 +218,6 @@ public class UserServiceUTest {
         when(userRepository.findByUsername(validRegisterRequest.getUsername())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(validRegisterRequest.getEmail())).thenReturn(Optional.of(existingUser));
 
-        // When & Then
         EmailAlreadyExistsException exception =
                 assertThrows(EmailAlreadyExistsException.class, () -> userService.register(validRegisterRequest));
         assertTrue(exception.getMessage().contains(EMAIL_EXIST));
@@ -240,23 +228,19 @@ public class UserServiceUTest {
         verify(passwordEncoder, never()).encode(anyString());
     }
 
-    // ---------- updateUserProfile() ----------
     @Test
     void givenMissingUserFromDatabase_whenUpdateUserProfile_thenExceptionIsThrown() {
 
-        // Given
         String username = "missing";
         UserEditRequest dto = new UserEditRequest();
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(UserNotFoundException.class, () -> userService.updateUserProfile(username, dto));
     }
 
     @Test
     void givenExistingUser_whenUpdateUserProfileWithActualEmail_thenChangeTheirProfileAndSaveToDatabase() {
 
-        // Given
         String username = "existing";
 
         UserEditRequest dto = new UserEditRequest();
@@ -269,10 +253,8 @@ public class UserServiceUTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(defaultUser));
 
-        // When
         userService.updateUserProfile(username, dto);
 
-        // Then
         assertEquals("peev@test.bg", defaultUser.getEmail());
         assertEquals("Dimitar", defaultUser.getFirstName());
         assertEquals("Peev", defaultUser.getLastName());
@@ -285,7 +267,6 @@ public class UserServiceUTest {
     @Test
     void givenExistingUser_whenUpdateUserProfileWithExistingEmail_thenExceptionIsThrown() {
 
-        // Given
         String username = "existing";
 
         UserEditRequest dto = new UserEditRequest();
@@ -299,7 +280,6 @@ public class UserServiceUTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(defaultUser));
         when(userRepository.findByEmail(dto.getEmail())).thenReturn(Optional.of(new User()));
 
-        // When & Then
         EmailDuplicateException exception =
                 assertThrows(EmailDuplicateException.class, () -> userService.updateUserProfile(username, dto));
         assertTrue(exception.getMessage().contains(EMAIL_EXIST));
@@ -308,7 +288,6 @@ public class UserServiceUTest {
     @Test
     void givenExistingUser_whenUpdateUserProfileWithSameEmail_thenChangeOtherDetailsAndSaveToDatabase() {
 
-        // Given
         String username = "existing";
         String originalEmail = "peev@abv.bg";
 
@@ -328,10 +307,8 @@ public class UserServiceUTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(userRepository.findByEmail(originalEmail)).thenReturn(Optional.of(user));
 
-        // When
         userService.updateUserProfile(username, dto);
 
-        // Then
         assertEquals(originalEmail, user.getEmail());
         assertEquals("Dimitar", user.getFirstName());
         assertEquals("Peev", user.getLastName());
@@ -341,94 +318,148 @@ public class UserServiceUTest {
         verify(userRepository, times(1)).findByEmail(originalEmail);
     }
 
-    // ---------- blockUser() ----------
     @Test
-    void givenUserWithStatusUnblocked_whenSwitchStatus_thenUserStatusBecomeBlocked() {
+    void givenUserWithStatusUnblocked_whenSwitchStatus_thenUserStatusBecomeBlocked() throws NoSuchFieldException, IllegalAccessException {
 
-        // Given
         defaultUser.setBlocked(false);
         when(userRepository.findById(defaultUser.getId())).thenReturn(Optional.of(defaultUser));
 
-        // When
+        when(jdbcTemplate.update(anyString(), any(Object[].class))).thenReturn(1);
+
+        Field jdbcField = UserService.class.getDeclaredField("jdbcTemplate");
+        jdbcField.setAccessible(true);
+        jdbcField.set(userService, jdbcTemplate);
+
         userService.blockUser(defaultUser.getId());
 
-        // Then
         assertTrue(defaultUser.isBlocked());
         verify(userRepository, times(1)).save(defaultUser);
     }
 
-    // ---------- unblockUser() ----------
     @Test
     void givenUserWithStatusBlocked_whenSwitchStatus_thenUserStatusBecomeUnblocked() {
 
-        // Given
         defaultUser.setBlocked(true);
         when(userRepository.findById(defaultUser.getId())).thenReturn(Optional.of(defaultUser));
 
-        // When
         userService.unblockUser(defaultUser.getId());
 
-        // Then
         assertFalse(defaultUser.isBlocked());
         verify(userRepository, times(1)).save(defaultUser);
     }
 
-    // ---------- getById() ----------
     @Test
     void givenId_whenFound_thenReturnUser() {
 
-        // Given
         UUID userId = defaultUser.getId();
         when(userRepository.findById(userId)).thenReturn(Optional.of(defaultUser));
 
-        // When
         User result = userService.getById(userId);
 
-        // Then
         assertEquals(defaultUser, result);
     }
 
     @Test
     void givenId_whenNotFound_thenThrowUserNotFoundException() {
-        // Given
+
         UUID userId = UUID.randomUUID();
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(UserNotFoundException.class, () -> userService.getById(userId));
     }
 
-    // ---------- getByUsername() ----------
     @Test
     void givenUsername_whenFound_thenReturnUser() {
-        // Given
+
         String username = defaultUser.getUsername();
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(defaultUser));
 
-        // When
         User result = userService.getByUsername(username);
 
-        // Then
         assertEquals(defaultUser, result);
     }
 
     @Test
     void givenUsername_whenNotFound_thenThrowUserNotFoundException() {
 
-        // Given
         String username = "missing";
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(UserNotFoundException.class, () -> userService.getByUsername(username));
     }
 
-    // ---------- loadUserByUsername() ----------
-    // Test 1: When user exists - then return new AuthenticationMetadata
+    @Test
+    void testHasRole_returnsTrue() {
+        when(userRepository.findByUsername(defaultUser.getUsername())).thenReturn(Optional.of(defaultUser));
+        assertTrue(userService.hasRole(defaultUser.getUsername(), Role.USER));
+    }
+
+    @Test
+    void testHasRole_returnsFalse_whenRoleIsDifferent() {
+        when(userRepository.findByUsername(defaultUser.getUsername())).thenReturn(Optional.of(defaultUser));
+        assertFalse(userService.hasRole(defaultUser.getUsername(), Role.ADMIN));
+    }
+
+    @Test
+    void testHasRole_returnsFalse_whenUserMissing() {
+
+        String username = "missing";
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        assertFalse(userService.hasRole(username, Role.ADMIN));
+    }
+
+    @Test
+    void updateUser_shouldUpdateAllFieldsAndSave() {
+
+        UUID id = UUID.randomUUID();
+
+        User existingUser = new User();
+        existingUser.setId(id);
+        existingUser.setUsername("oldUsername");
+        existingUser.setEmail("old@mail.com");
+        existingUser.setFirstName("Old");
+        existingUser.setLastName("User");
+        existingUser.setPhoneNumber("0000000000");
+        existingUser.setRole(Role.USER);
+
+        User updatedUser = new User();
+        updatedUser.setUsername("newUsername");
+        updatedUser.setEmail("new@mail.com");
+        updatedUser.setFirstName("New");
+        updatedUser.setLastName("Name");
+        updatedUser.setPhoneNumber("0888123456");
+        updatedUser.setRole(Role.ADMIN);
+
+        when(userRepository.findById(id)).thenReturn(Optional.of(existingUser));
+
+        userService.updateUser(id, updatedUser);
+
+        assertEquals("newUsername", existingUser.getUsername());
+        assertEquals("new@mail.com", existingUser.getEmail());
+        assertEquals("New", existingUser.getFirstName());
+        assertEquals("Name", existingUser.getLastName());
+        assertEquals("0888123456", existingUser.getPhoneNumber());
+        assertEquals(Role.ADMIN, existingUser.getRole());
+
+        verify(userRepository).save(existingUser);
+    }
+
+    @Test
+    void givenUserWithDisabledNotifications_whenToggleNotifications_thenUserNotificationsIsEnabled() {
+
+        User user = new User();
+        user.setNotificationsEnabled(false);
+
+        userService.toggleNotifications(user);
+
+        assertTrue(user.isNotificationsEnabled());
+        verify(userRepository, times(1)).save(user);
+    }
+
     @Test
     void givenExistingUser_whenLoadUserByUsername_thenReturnCorrectAuthenticationMetadata() {
 
-        // Given
         String username = "Dimitar";
 
         User user = new User();
@@ -441,10 +472,8 @@ public class UserServiceUTest {
 
         when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.of(user));
 
-        // When
         UserDetails authenticationMetadata = userService.loadUserByUsername(username);
 
-        // Then
         assertInstanceOf(AuthenticationMetadata.class, authenticationMetadata);
         AuthenticationMetadata result = (AuthenticationMetadata) authenticationMetadata;
         assertEquals(user.getId(), result.getUserId());
@@ -457,34 +486,15 @@ public class UserServiceUTest {
         assertEquals("ROLE_USER", result.getAuthorities().iterator().next().getAuthority());
     }
 
-    // Test 2: When User does not exist - then throws exception
     @Test
     void givenMissingUserFromDatabase_whenLoadUserByUsername_thenExceptionIsThrown() {
 
-        // Given
         String username = "missing";
         when(userRepository.findByUsernameOrEmail(anyString(), anyString())).thenReturn(Optional.empty());
 
-        // When & Then
         UsernameNotFoundException exception =
                 assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(username));
         assertTrue(exception.getMessage().contains("User not found: " + username));
 
-    }
-
-    // ---------- toggleNotifications() ----------
-    @Test
-    void givenUserWithDisabledNotifications_whenToggleNotifications_thenUserNotificationsIsEnabled() {
-
-        // Given
-        User user = new User();
-        user.setNotificationsEnabled(false);
-
-        // When
-        userService.toggleNotifications(user);
-
-        // Then
-        assertTrue(user.isNotificationsEnabled());
-        verify(userRepository, times(1)).save(user);
     }
 }
