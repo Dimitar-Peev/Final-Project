@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: eventhub-mysql
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  event-hub:
+    image: mctrix87/event-hub:1.0.0
+    container_name: event-hub
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - notification-service
+      - payment-service
+
+  notification-service:
+    image: mctrix87/eventhub-notification-service:1.0.0
+    container_name: notification-service
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+
+  payment-service:
+    image: mctrix87/eventhub-payment-service:1.0.0
+    container_name: payment-service
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
